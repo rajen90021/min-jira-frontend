@@ -1,16 +1,53 @@
-# React + Vite
+# Mini Jira Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the frontend application for the Mini Jira project, a task management system.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Framework**: [React](https://react.dev/) with [Vite](https://vitejs.dev/)
+- **UI Component Library**: [Material UI (MUI)](https://mui.com/)
+- **State Management**: [Redux Toolkit](https://redux-toolkit.js.org/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) & Emotion
+- **Routing**: [React Router](https://reactrouter.com/)
+- **Data Fetching**: Axios & TanStack Query
 
-## React Compiler
+## Prerequisites
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Node.js (v14 or higher)
+- npm or yarn
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1.  **Install Dependencies**
+
+    ```bash
+    npm install
+    ```
+
+2.  **Run Development Server**
+
+    ```bash
+    npm run dev
+    ```
+
+    The application will be available at `http://localhost:5173` (or the port shown in your terminal).
+
+3.  **Build for Production**
+
+    ```bash
+    npm run build
+    ```
+
+4.  **Preview Production Build**
+
+    ```bash
+    npm run preview
+    ```
+
+## Project Structure
+
+- `src/components`: Reusable UI components
+- `src/layouts`: Application layout components (e.g., MainLayout)
+- `src/pages`: Page components corresponding to routes
+- `src/store`: Redux store configuration and slices
+- `src/utils`: Utility functions and helpers
