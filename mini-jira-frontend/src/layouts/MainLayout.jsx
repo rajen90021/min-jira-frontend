@@ -311,20 +311,33 @@ export default function MiniDrawer() {
                 <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                     <DrawerHeader>
                         {open && (
-                            <Typography
-                                variant="h6"
-                                sx={{
-                                    flexGrow: 1,
-                                    fontWeight: 700,
-                                    background: 'linear-gradient(45deg, #00c6ff 30%, #0072ff 90%)',
-                                    WebkitBackgroundClip: 'text',
-                                    WebkitTextFillColor: 'transparent',
-                                    letterSpacing: '0.5px',
-                                    ml: 2,
-                                }}
-                            >
-                                Detroit
-                            </Typography>
+                            <Box sx={{ flexGrow: 1, ml: 2, display: 'flex', flexDirection: 'column' }}>
+                                <Typography
+                                    variant="h6"
+                                    sx={{
+                                        fontWeight: 700,
+                                        background: 'linear-gradient(45deg, #00c6ff 30%, #0072ff 90%)',
+                                        WebkitBackgroundClip: 'text',
+                                        WebkitTextFillColor: 'transparent',
+                                        letterSpacing: '0.5px',
+                                        lineHeight: 1.2
+                                    }}
+                                >
+                                    Detroit
+                                </Typography>
+                                <Typography
+                                    variant="caption"
+                                    sx={{
+                                        fontWeight: 500,
+                                        color: 'text.secondary',
+                                        letterSpacing: '0.5px',
+                                        lineHeight: 1,
+                                        mt: -0.5
+                                    }}
+                                >
+                                    we code a success
+                                </Typography>
+                            </Box>
                         )}
                         <IconButton onClick={handleDrawerClose}>
                             {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
