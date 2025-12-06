@@ -166,7 +166,7 @@ const DrawerMenu = ({ items, open }) => (
 
 export default function MiniDrawer() {
     const theme = useTheme();
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = React.useState(localStorage.getItem('sidebarOpen') === 'true');
     const [anchorEl, setAnchorEl] = React.useState(null);
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -181,10 +181,12 @@ export default function MiniDrawer() {
 
     const handleDrawerOpen = () => {
         setOpen(true);
+        localStorage.setItem('sidebarOpen', 'true');
     };
 
     const handleDrawerClose = () => {
         setOpen(false);
+        localStorage.setItem('sidebarOpen', 'false');
     };
 
     const handleMenuOpen = (event) => {
