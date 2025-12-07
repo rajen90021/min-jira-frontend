@@ -298,11 +298,11 @@ const TicketsPage = () => {
     });
 
     return (
-        <div className="p-6 max-h-screen overflow-hidden flex flex-col h-full">
-            <div className="flex justify-between items-center mb-8">
+        <div className="p-4 sm:p-6 max-h-screen overflow-hidden flex flex-col h-full">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Tickets</h1>
-                    <p className="text-gray-500 dark:text-gray-400">Manage and track issues</p>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white mb-1 sm:mb-2">Tickets</h1>
+                    <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">Manage and track issues</p>
                 </div>
                 <motion.button
                     whileHover={{ scale: 1.05 }}
@@ -311,15 +311,15 @@ const TicketsPage = () => {
                         setTicketToEdit(null);
                         setIsDrawerOpen(true);
                     }}
-                    className="flex items-center gap-2 bg-[#007bff] hover:bg-[#0069d9] text-white px-5 py-2.5 rounded-lg shadow-lg shadow-blue-500/20 transition-all font-medium"
+                    className="flex items-center gap-2 bg-[#007bff] hover:bg-[#0069d9] text-white px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg shadow-lg shadow-blue-500/20 transition-all font-medium text-sm sm:text-base w-full sm:w-auto justify-center"
                 >
                     <IoAdd size={20} />
                     New Ticket
                 </motion.button>
             </div>
 
-            <div className="mb-8 flex flex-col sm:flex-row gap-4 justify-between items-center">
-                <div className="relative w-full sm:w-96">
+            <div className="mb-6 sm:mb-8 flex flex-col xl:flex-row gap-4 justify-between items-start xl:items-center">
+                <div className="relative w-full xl:w-96">
                     <IoSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
                         value={globalFilter ?? ''}
@@ -329,7 +329,7 @@ const TicketsPage = () => {
                     />
                 </div>
 
-                <div className="flex w-full sm:w-auto gap-3 items-center">
+                <div className="flex w-full xl:w-auto gap-3 items-center flex-wrap">
                     {(statusFilter || priorityFilter || globalFilter || sortConfig.value !== 'createdAt') && (
                         <button
                             onClick={() => {
@@ -343,7 +343,7 @@ const TicketsPage = () => {
                             Clear All
                         </button>
                     )}
-                    <div className="w-40">
+                    <div className="w-full sm:w-40">
                         <FilterDropdown
                             title="Status"
                             value={statusFilter}
@@ -352,7 +352,7 @@ const TicketsPage = () => {
                             clearable
                         />
                     </div>
-                    <div className="w-40">
+                    <div className="w-full sm:w-40">
                         <FilterDropdown
                             title="Priority"
                             value={priorityFilter}
@@ -361,7 +361,7 @@ const TicketsPage = () => {
                             clearable
                         />
                     </div>
-                    <div className="w-48">
+                    <div className="w-full sm:w-48">
                         <FilterDropdown
                             title="Sort By"
                             value={sortConfig}
@@ -372,8 +372,8 @@ const TicketsPage = () => {
                 </div>
             </div>
 
-            <div className="flex-1 overflow-auto bg-white dark:bg-[#1e1e1e] rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
-                <table className="w-full text-left border-collapse">
+            <div className="flex-1 overflow-auto bg-white dark:bg-[#1e1e1e] rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm w-full overflow-x-auto">
+                <table className="w-full text-left border-collapse min-w-[800px]">
                     <thead className="bg-gray-50 dark:bg-[#252526] sticky top-0 z-10">
                         {table.getHeaderGroups().map((headerGroup) => (
                             <tr key={headerGroup.id}>

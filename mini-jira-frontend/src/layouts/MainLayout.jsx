@@ -83,6 +83,8 @@ const AppBar = styled(MuiAppBar, {
     ],
 }));
 
+import useMediaQuery from '@mui/material/useMediaQuery';
+
 const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
     ({ theme }) => ({
         width: drawerWidth,
@@ -166,11 +168,27 @@ const DrawerMenu = ({ items, open }) => (
 
 export default function MiniDrawer() {
     const theme = useTheme();
-    const [open, setOpen] = React.useState(localStorage.getItem('sidebarOpen') === 'true');
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    // Initialize open state based on device type and localStorage
+    const [open, setOpen] = React.useState(() => {
+        // Always closed on mobile by default
+        if (window.innerWidth < 600) return false;
+        return localStorage.getItem('sidebarOpen') === 'true';
+    });
+
     const [anchorEl, setAnchorEl] = React.useState(null);
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { user } = useSelector((state) => state.auth);
+
+    // Sync open state when switching between mobile/desktop
+    React.useEffect(() => {
+        if (isMobile) {
+            setOpen(false);
+        } else {
+            setOpen(localStorage.getItem('sidebarOpen') === 'true');
+        }
+    }, [isMobile]);
 
     const drawerItems = [
         { label: 'Dashboard', path: '/app/dashboard', icon: <InboxIcon /> },
@@ -181,12 +199,12 @@ export default function MiniDrawer() {
 
     const handleDrawerOpen = () => {
         setOpen(true);
-        localStorage.setItem('sidebarOpen', 'true');
+        if (!isMobile) localStorage.setItem('sidebarOpen', 'true');
     };
 
     const handleDrawerClose = () => {
         setOpen(false);
-        localStorage.setItem('sidebarOpen', 'false');
+        if (!isMobile) localStorage.setItem('sidebarOpen', 'false');
     };
 
     const handleMenuOpen = (event) => {
@@ -208,10 +226,135 @@ export default function MiniDrawer() {
         navigate('/app/profile');
     };
 
+    const drawerContent = (
+        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+            <DrawerHeader>
+                {/* On mobile, or when open on desktop, show the logo/text */}
+                {(open || isMobile) && (
+                    <Box sx={{ flexGrow: 1, ml: 2, display: 'flex', flexDirection: 'column' }}>
+                        <Typography
+                            variant="h6"
+                            sx={{
+                                fontWeight: 700,
+                                background: 'linear-gradient(45deg, #00c6ff 30%, #0072ff 90%)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                letterSpacing: '0.5px',
+                                lineHeight: 1.2
+                            }}
+                        >
+                            Detroit
+                        </Typography>
+                        <Typography
+                            variant="caption"
+                            sx={{
+                                fontWeight: 500,
+                                color: 'text.secondary',
+                                letterSpacing: '0.5px',
+                                lineHeight: 1,
+                                mt: -0.5
+                            }}
+                        >
+                            we code a success
+                        </Typography>
+                    </Box>
+                )}
+                <IconButton onClick={handleDrawerClose}>
+                    {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+                </IconButton>
+            </DrawerHeader>
+            <Divider />
+            {/* Pass open=true to DrawerMenu on mobile so labels always show when drawer is open */}
+            <DrawerMenu open={isMobile ? true : open} items={drawerItems} />
+
+            {/* Sidebar Footer */}
+            <Box sx={{
+                marginTop: 'auto',
+                p: (open || isMobile) ? 2 : 1,
+                borderTop: '1px solid',
+                borderColor: 'divider',
+            }}>
+                {(open || isMobile) ? (
+                    <Box>
+                        <Box sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1.5,
+                            mb: 1.5,
+                            p: 1,
+                            borderRadius: 2,
+                            bgcolor: 'action.hover',
+                        }}>
+                            <Avatar
+                                sx={{
+                                    width: 36,
+                                    height: 36,
+                                    bgcolor: user?.role?.toLowerCase() === 'manager' ? '#f59e0b' : '#3b82f6',
+                                    fontSize: '0.9rem',
+                                    fontWeight: 600,
+                                }}
+                            >
+                                {user?.name?.charAt(0).toUpperCase() || 'U'}
+                            </Avatar>
+                            <Box sx={{ flex: 1, minWidth: 0 }}>
+                                <Typography
+                                    variant="body2"
+                                    sx={{
+                                        fontWeight: 600,
+                                        fontSize: '0.875rem',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
+                                    }}
+                                >
+                                    {user?.name || 'User'}
+                                </Typography>
+                                <Typography
+                                    variant="caption"
+                                    sx={{
+                                        color: 'text.secondary',
+                                        fontSize: '0.75rem',
+                                    }}
+                                >
+                                    {user?.role || 'Developer'}
+                                </Typography>
+                            </Box>
+                        </Box>
+                        <Divider sx={{ my: 1 }} />
+                        <Typography
+                            variant="caption"
+                            sx={{
+                                display: 'block',
+                                textAlign: 'center',
+                                color: 'text.secondary',
+                                fontSize: '0.7rem',
+                            }}
+                        >
+                            v1.0.0 • © 2025 Detroit
+                        </Typography>
+                    </Box>
+                ) : (
+                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                        <Avatar
+                            sx={{
+                                width: 32,
+                                height: 32,
+                                bgcolor: user?.role?.toLowerCase() === 'manager' ? '#f59e0b' : '#3b82f6',
+                                fontSize: '0.85rem',
+                            }}
+                        >
+                            {user?.name?.charAt(0).toUpperCase() || 'U'}
+                        </Avatar>
+                    </Box>
+                )}
+            </Box>
+        </Box>
+    );
+
     return (
         <Box sx={{ display: 'flex' }}>
             <CssBaseline />
-            <AppBar position="fixed" open={open} sx={{ backgroundColor: theme.palette.primary.dark }}>
+            <AppBar position="fixed" open={open && !isMobile} sx={{ backgroundColor: theme.palette.primary.dark }}>
                 <Toolbar>
                     <IconButton
                         color="inherit"
@@ -222,7 +365,7 @@ export default function MiniDrawer() {
                             {
                                 marginRight: 5,
                             },
-                            open && { display: 'none' },
+                            (open && !isMobile) && { display: 'none' },
                         ]}
                     >
                         <MenuIcon />
@@ -309,128 +452,27 @@ export default function MiniDrawer() {
                     </Menu>
                 </Toolbar>
             </AppBar>
-            <Drawer variant="permanent" open={open}>
-                <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                    <DrawerHeader>
-                        {open && (
-                            <Box sx={{ flexGrow: 1, ml: 2, display: 'flex', flexDirection: 'column' }}>
-                                <Typography
-                                    variant="h6"
-                                    sx={{
-                                        fontWeight: 700,
-                                        background: 'linear-gradient(45deg, #00c6ff 30%, #0072ff 90%)',
-                                        WebkitBackgroundClip: 'text',
-                                        WebkitTextFillColor: 'transparent',
-                                        letterSpacing: '0.5px',
-                                        lineHeight: 1.2
-                                    }}
-                                >
-                                    Detroit
-                                </Typography>
-                                <Typography
-                                    variant="caption"
-                                    sx={{
-                                        fontWeight: 500,
-                                        color: 'text.secondary',
-                                        letterSpacing: '0.5px',
-                                        lineHeight: 1,
-                                        mt: -0.5
-                                    }}
-                                >
-                                    we code a success
-                                </Typography>
-                            </Box>
-                        )}
-                        <IconButton onClick={handleDrawerClose}>
-                            {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-                        </IconButton>
-                    </DrawerHeader>
-                    <Divider />
-                    <DrawerMenu open={open} items={drawerItems} />
 
-                    {/* Sidebar Footer */}
-                    <Box sx={{
-                        marginTop: 'auto',
-                        p: open ? 2 : 1,
-                        borderTop: '1px solid',
-                        borderColor: 'divider',
-                    }}>
-                        {open ? (
-                            <Box>
-                                <Box sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: 1.5,
-                                    mb: 1.5,
-                                    p: 1,
-                                    borderRadius: 2,
-                                    bgcolor: 'action.hover',
-                                }}>
-                                    <Avatar
-                                        sx={{
-                                            width: 36,
-                                            height: 36,
-                                            bgcolor: user?.role?.toLowerCase() === 'manager' ? '#f59e0b' : '#3b82f6',
-                                            fontSize: '0.9rem',
-                                            fontWeight: 600,
-                                        }}
-                                    >
-                                        {user?.name?.charAt(0).toUpperCase() || 'U'}
-                                    </Avatar>
-                                    <Box sx={{ flex: 1, minWidth: 0 }}>
-                                        <Typography
-                                            variant="body2"
-                                            sx={{
-                                                fontWeight: 600,
-                                                fontSize: '0.875rem',
-                                                overflow: 'hidden',
-                                                textOverflow: 'ellipsis',
-                                                whiteSpace: 'nowrap',
-                                            }}
-                                        >
-                                            {user?.name || 'User'}
-                                        </Typography>
-                                        <Typography
-                                            variant="caption"
-                                            sx={{
-                                                color: 'text.secondary',
-                                                fontSize: '0.75rem',
-                                            }}
-                                        >
-                                            {user?.role || 'Developer'}
-                                        </Typography>
-                                    </Box>
-                                </Box>
-                                <Divider sx={{ my: 1 }} />
-                                <Typography
-                                    variant="caption"
-                                    sx={{
-                                        display: 'block',
-                                        textAlign: 'center',
-                                        color: 'text.secondary',
-                                        fontSize: '0.7rem',
-                                    }}
-                                >
-                                    v1.0.0 • © 2025 Detroit
-                                </Typography>
-                            </Box>
-                        ) : (
-                            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                                <Avatar
-                                    sx={{
-                                        width: 32,
-                                        height: 32,
-                                        bgcolor: user?.role?.toLowerCase() === 'manager' ? '#f59e0b' : '#3b82f6',
-                                        fontSize: '0.85rem',
-                                    }}
-                                >
-                                    {user?.name?.charAt(0).toUpperCase() || 'U'}
-                                </Avatar>
-                            </Box>
-                        )}
-                    </Box>
-                </Box>
-            </Drawer>
+            {isMobile ? (
+                <MuiDrawer
+                    variant="temporary"
+                    open={open}
+                    onClose={handleDrawerClose}
+                    ModalProps={{
+                        keepMounted: true, // Better open performance on mobile.
+                    }}
+                    sx={{
+                        display: { xs: 'block', sm: 'none' },
+                        '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+                    }}
+                >
+                    {drawerContent}
+                </MuiDrawer>
+            ) : (
+                <Drawer variant="permanent" open={open}>
+                    {drawerContent}
+                </Drawer>
+            )}
 
             <Box component="main" sx={{ flexGrow: 1, height: '100vh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                 <DrawerHeader />
