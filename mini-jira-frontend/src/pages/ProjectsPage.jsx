@@ -5,7 +5,7 @@ import {
     flexRender,
 } from '@tanstack/react-table';
 import { useDispatch, useSelector } from 'react-redux';
-import { IoAdd, IoSearch, IoBriefcase, IoPencil, IoTrash, IoChevronDown } from "react-icons/io5";
+import { IoAdd, IoSearch, IoBriefcase, IoPencil, IoTrash, IoChevronDown, IoClose } from "react-icons/io5";
 import {
     fetchProjectsStart, fetchProjectsSuccess, fetchProjectsFailure,
     deleteProjectStart, deleteProjectSuccess, deleteProjectFailure
@@ -38,6 +38,7 @@ const ProjectsPage = () => {
     };
 
     const [globalFilter, setGlobalFilter] = useState('');
+    const resetSearch = () => setGlobalFilter('');
     const [{ pageIndex, pageSize }, setPagination] = useState({
         pageIndex: 0,
         pageSize: 10,
@@ -192,16 +193,36 @@ const ProjectsPage = () => {
             </motion.div>
 
             {/* Search Bar - Fixed */}
-            <div className="flex flex-col xl:flex-row gap-2 md:gap-6 justify-between items-start xl:items-center flex-shrink-0">
-                <div className="glass-card relative w-full xl:w-96 rounded-2xl bg-white border border-slate-200">
-                    <IoSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+            <div className="flex flex-col xl:flex-row gap-2 md:gap-4 justify-start items-stretch xl:items-center flex-shrink-0">
+                <div className="glass-card relative w-full xl:w-96 rounded-2xl bg-white border border-slate-200 group">
+                    <IoSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                     <input
                         value={globalFilter ?? ''}
                         onChange={(e) => setGlobalFilter(e.target.value)}
                         placeholder="Search projects..."
-                        className="w-full bg-transparent border-none rounded-2xl pl-12 pr-4 py-3 md:py-4 outline-none text-slate-800 transition-all font-bold"
+                        className="w-full bg-transparent border-none rounded-2xl pl-12 pr-12 py-3 md:py-4 outline-none text-slate-800 transition-all font-bold"
                     />
+                    {globalFilter && (
+                        <button
+                            onClick={() => setGlobalFilter('')}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-rose-500 p-1 rounded-full hover:bg-rose-50 transition-all"
+                        >
+                            <IoClose size={20} />
+                        </button>
+                    )}
                 </div>
+
+                {globalFilter && (
+                    <motion.button
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        onClick={resetSearch}
+                        className="flex items-center gap-2 px-6 py-3 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-2xl transition-all font-black text-[10px] uppercase tracking-widest whitespace-nowrap border border-rose-100"
+                    >
+                        <IoClose size={18} />
+                        Clear Search
+                    </motion.button>
+                )}
             </div>
 
             {/* Table Area - Scrollable */}

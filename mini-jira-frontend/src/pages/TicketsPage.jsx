@@ -19,7 +19,8 @@ import {
     IoPerson,
     IoCreate,
     IoTrash,
-    IoSync
+    IoSync,
+    IoClose
 } from 'react-icons/io5';
 import { format } from 'date-fns';
 import { useToast } from '../contexts/ToastContext';
@@ -107,6 +108,14 @@ const TicketsPage = () => {
         setIsDrawerOpen(false);
         setTicketToEdit(null);
     };
+
+    const resetFilters = () => {
+        setGlobalFilter('');
+        setStatusFilter('All');
+        setPriorityFilter('All');
+    };
+
+    const hasActiveFilters = globalFilter !== '' || statusFilter !== 'All' || priorityFilter !== 'All';
 
     const filteredData = useMemo(() => {
         return tickets.filter(ticket => {
@@ -280,15 +289,36 @@ const TicketsPage = () => {
 
             {/* Filter Section */}
             <div className="flex flex-col xl:flex-row gap-2 md:gap-4 items-stretch xl:items-center justify-between flex-shrink-0">
-                <div className="relative flex-1 max-w-xl">
-                    <IoSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                <div className="relative flex-1 max-w-xl group">
+                    <IoSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                     <input
                         value={globalFilter ?? ''}
                         onChange={(e) => setGlobalFilter(e.target.value)}
                         placeholder="Search ticket matrix..."
-                        className="w-full bg-white border border-slate-100 rounded-2xl pl-12 pr-4 py-3 md:py-4 outline-none text-slate-900 font-bold transition-all shadow-sm focus:border-blue-500/50"
+                        className="w-full bg-white border border-slate-100 rounded-2xl pl-12 pr-12 py-3 md:py-4 outline-none text-slate-900 font-bold transition-all shadow-sm focus:border-blue-500/50"
                     />
+                    {globalFilter && (
+                        <button
+                            onClick={() => setGlobalFilter('')}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-rose-500 p-1 rounded-full hover:bg-rose-50 transition-all"
+                            title="Clear search"
+                        >
+                            <IoClose size={20} />
+                        </button>
+                    )}
                 </div>
+
+                {hasActiveFilters && (
+                    <motion.button
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        onClick={resetFilters}
+                        className="flex items-center gap-2 px-6 py-3 md:py-4 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-2xl transition-all font-black text-[10px] uppercase tracking-widest whitespace-nowrap shadow-sm border border-rose-100"
+                    >
+                        <IoClose size={18} />
+                        Clear All
+                    </motion.button>
+                )}
 
                 <div className="flex flex-wrap items-center gap-3">
                     <FilterDropdown
