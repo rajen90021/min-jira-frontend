@@ -7,6 +7,8 @@ import ProfilePage from './pages/ProfilePage';
 import DevelopersPage from './pages/DevelopersPage';
 import ProjectsPage from './pages/ProjectsPage';
 import TicketsPage from './pages/TicketsPage';
+import KanbanBoardPage from './pages/KanbanBoardPage';
+import ActivityTimelinePage from './pages/ActivityTimelinePage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -22,6 +24,8 @@ function App() {
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="projects" element={<ProjectsPage />} />
           <Route path="tickets" element={<TicketsPage />} />
+          <Route path="kanban-board" element={<KanbanBoardPage />} />
+          <Route path="timeline" element={<ActivityTimelinePage />} />
           <Route path="developers" element={<DevelopersPage />} />
           <Route path="profile" element={<ProfilePage />} />
         </Route>

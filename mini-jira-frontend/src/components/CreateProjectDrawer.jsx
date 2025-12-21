@@ -9,7 +9,6 @@ import {
 import projectService from '../services/projectService';
 import userService from '../services/userService';
 
-// Status options for projects
 const PROJECT_STATUS = {
     ACTIVE: 'Active',
     COMPLETED: 'Completed',
@@ -23,7 +22,6 @@ export default function CreateProjectDrawer({ open, onClose, projectToEdit }) {
     const [managerOptions, setManagerOptions] = useState([]);
     const isEditMode = !!projectToEdit;
 
-    // Form State
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -33,14 +31,13 @@ export default function CreateProjectDrawer({ open, onClose, projectToEdit }) {
         endDate: '',
     });
 
-    // Reset form when drawer opens/closes or projectToEdit changes
     useEffect(() => {
         if (open) {
             if (projectToEdit) {
                 setFormData({
                     name: projectToEdit.name || '',
                     description: projectToEdit.description || '',
-                    managerId: projectToEdit.managerId?._id || projectToEdit.managerId || '', // Handle populated or ID
+                    managerId: projectToEdit.managerId?._id || projectToEdit.managerId || '',
                     status: projectToEdit.status || PROJECT_STATUS.ACTIVE,
                     startDate: projectToEdit.startDate ? projectToEdit.startDate.split('T')[0] : '',
                     endDate: projectToEdit.endDate ? projectToEdit.endDate.split('T')[0] : '',
@@ -58,12 +55,10 @@ export default function CreateProjectDrawer({ open, onClose, projectToEdit }) {
         }
     }, [open, projectToEdit]);
 
-    // Fetch Managers for the dropdown
     useEffect(() => {
         if (open) {
             const fetchManagers = async () => {
                 try {
-                    // Fetch all users to populate the manager dropdown
                     const data = await userService.getUsers({ limit: 100 });
                     setManagerOptions(data.users || []);
                 } catch (err) {
@@ -83,7 +78,6 @@ export default function CreateProjectDrawer({ open, onClose, projectToEdit }) {
         e.preventDefault();
 
         if (isEditMode) {
-            // Update existing project
             dispatch(updateProjectStart());
             try {
                 const updatedProject = await projectService.updateProject(projectToEdit._id, formData);
@@ -94,7 +88,6 @@ export default function CreateProjectDrawer({ open, onClose, projectToEdit }) {
                 dispatch(updateProjectFailure(msg));
             }
         } else {
-            // Create new project
             dispatch(createProjectStart());
             try {
                 await projectService.createProject(formData);
@@ -110,7 +103,18 @@ export default function CreateProjectDrawer({ open, onClose, projectToEdit }) {
     return (
         <Transition.Root show={open} as={Fragment}>
             <Dialog as="div" className="relative z-50" onClose={onClose}>
-                <div className="fixed inset-0 bg-black/30 backdrop-blur-sm transition-opacity" />
+                {/* Backdrop - Solid Dim */}
+                <Transition.Child
+                    as={Fragment}
+                    enter="ease-out duration-300"
+                    enterFrom="opacity-0"
+                    enterTo="opacity-100"
+                    leave="ease-in duration-200"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                >
+                    <div className="fixed inset-0 bg-slate-900/60 transition-opacity" />
+                </Transition.Child>
 
                 <div className="fixed inset-0 overflow-hidden">
                     <div className="absolute inset-0 overflow-hidden">
@@ -124,31 +128,34 @@ export default function CreateProjectDrawer({ open, onClose, projectToEdit }) {
                                 leaveFrom="translate-x-0"
                                 leaveTo="translate-x-full"
                             >
-                                <Dialog.Panel className="pointer-events-auto w-screen max-w-md">
-                                    <div className="flex h-full flex-col overflow-y-scroll bg-white dark:bg-[#1e1e1e] shadow-xl">
-                                        <div className="px-6 py-6 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
-                                            <Dialog.Title className="text-xl font-semibold text-gray-900 dark:text-white">
-                                                {isEditMode ? 'Edit Project' : 'New Project'}
-                                            </Dialog.Title>
+                                <Dialog.Panel className="pointer-events-auto w-screen max-w-lg">
+                                    <div className="flex h-full flex-col bg-white dark:bg-slate-950 shadow-2xl overflow-hidden border-l border-slate-200 dark:border-slate-800">
+                                        <div className="px-8 py-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900/50">
+                                            <div>
+                                                <Dialog.Title className="text-2xl font-black text-slate-900 dark:text-white leading-tight">
+                                                    {isEditMode ? 'Modify Initiative' : 'New Initiative'}
+                                                </Dialog.Title>
+                                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Project parameters and authority</p>
+                                            </div>
                                             <button
                                                 onClick={onClose}
-                                                className="text-gray-400 hover:text-gray-500 focus:outline-none"
+                                                className="p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-400 hover:text-rose-500 transition-all"
                                             >
                                                 <IoClose size={24} />
                                             </button>
                                         </div>
 
-                                        <div className="relative flex-1 px-6 py-6">
+                                        <div className="relative flex-1 px-8 py-8 overflow-y-auto scrollbar-hide">
                                             {isError && (
-                                                <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm">
+                                                <div className="mb-4 p-3 bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 rounded-lg text-red-600 dark:text-red-500 text-sm font-bold">
                                                     {message}
                                                 </div>
                                             )}
 
-                                            <form onSubmit={handleSubmit} className="space-y-5">
-                                                <div>
-                                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                                        Project Name
+                                            <form onSubmit={handleSubmit} className="space-y-6">
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
+                                                        Initiative Name
                                                     </label>
                                                     <input
                                                         type="text"
@@ -156,102 +163,102 @@ export default function CreateProjectDrawer({ open, onClose, projectToEdit }) {
                                                         required
                                                         value={formData.name}
                                                         onChange={handleChange}
-                                                        className="w-full bg-gray-50 dark:bg-[#252526] border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white"
-                                                        placeholder="e.g. Website Redesign"
+                                                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold placeholder:text-slate-400 transition-all"
+                                                        placeholder="e.g. Phoenix Protocol"
                                                     />
                                                 </div>
 
-                                                <div>
-                                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                                        Project Manager
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
+                                                        Designated Architect
                                                     </label>
                                                     <select
                                                         name="managerId"
                                                         required
                                                         value={formData.managerId}
                                                         onChange={handleChange}
-                                                        className="w-full bg-gray-50 dark:bg-[#252526] border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white"
+                                                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold appearance-none transition-all"
                                                     >
-                                                        <option value="">Select a Manager</option>
+                                                        <option value="" className="dark:bg-slate-900">Assign Authority...</option>
                                                         {managerOptions.map((manager) => (
-                                                            <option key={manager._id} value={manager._id}>
-                                                                {manager.name} ({manager.email})
+                                                            <option key={manager._id} value={manager._id} className="dark:bg-slate-900">
+                                                                {manager.name}
                                                             </option>
                                                         ))}
                                                     </select>
                                                 </div>
 
-                                                <div>
-                                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                                        Status
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
+                                                        Operational Status
                                                     </label>
                                                     <select
                                                         name="status"
                                                         value={formData.status}
                                                         onChange={handleChange}
-                                                        className="w-full bg-gray-50 dark:bg-[#252526] border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white"
+                                                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold appearance-none transition-all"
                                                     >
                                                         {Object.values(PROJECT_STATUS).map((status) => (
-                                                            <option key={status} value={status}>{status}</option>
+                                                            <option key={status} value={status} className="dark:bg-slate-900">{status}</option>
                                                         ))}
                                                     </select>
                                                 </div>
 
                                                 <div className="grid grid-cols-2 gap-4">
-                                                    <div>
-                                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                                            Start Date
+                                                    <div className="space-y-2">
+                                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
+                                                            Activation Date
                                                         </label>
                                                         <input
                                                             type="date"
                                                             name="startDate"
                                                             value={formData.startDate}
                                                             onChange={handleChange}
-                                                            className="w-full bg-gray-50 dark:bg-[#252526] border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white"
+                                                            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold transition-all"
                                                         />
                                                     </div>
-                                                    <div>
-                                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                                            End Date
+                                                    <div className="space-y-2">
+                                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
+                                                            Target Completion
                                                         </label>
                                                         <input
                                                             type="date"
                                                             name="endDate"
                                                             value={formData.endDate}
                                                             onChange={handleChange}
-                                                            className="w-full bg-gray-50 dark:bg-[#252526] border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white"
+                                                            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold transition-all"
                                                         />
                                                     </div>
                                                 </div>
 
-                                                <div>
-                                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                                        Description
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
+                                                        Mission Objectives
                                                     </label>
                                                     <textarea
                                                         name="description"
                                                         value={formData.description}
                                                         onChange={handleChange}
-                                                        rows={4}
-                                                        className="w-full bg-gray-50 dark:bg-[#252526] border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white resize-none"
-                                                        placeholder="Project details..."
+                                                        rows={8}
+                                                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold resize-none placeholder:text-slate-400 transition-all"
+                                                        placeholder="Define the scope and success criteria..."
                                                     />
                                                 </div>
 
-                                                <div className="pt-4 flex gap-3">
+                                                <div className="pt-6 flex gap-4">
                                                     <button
                                                         type="button"
                                                         onClick={onClose}
-                                                        className="flex-1 px-4 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-[#252526] transition-colors font-medium"
+                                                        className="flex-1 px-6 py-4 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-800 transition-all font-black text-[10px] uppercase tracking-widest"
                                                     >
-                                                        Cancel
+                                                        Abort
                                                     </button>
                                                     <button
                                                         type="submit"
                                                         disabled={isLoading}
-                                                        className="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-lg shadow-blue-500/20 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                                                        className="flex-1 px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl shadow-lg shadow-blue-500/10 font-black text-[10px] uppercase tracking-widest transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                                     >
-                                                        {isLoading ? (isEditMode ? 'Updating...' : 'Creating...') : (isEditMode ? 'Update Project' : 'Create Project')}
+                                                        {isLoading ? (isEditMode ? 'Syncing...' : 'Deploying...') : (isEditMode ? 'Synchronize Initiative' : 'Activate Initiative')}
                                                     </button>
                                                 </div>
                                             </form>

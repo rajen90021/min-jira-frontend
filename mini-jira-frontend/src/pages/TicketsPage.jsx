@@ -6,8 +6,8 @@ import {
 } from '@tanstack/react-table';
 import { useDispatch, useSelector } from 'react-redux';
 import ticketService from '../services/ticketService';
+
 import { motion } from 'framer-motion';
-import { IoAdd, IoSearch, IoTicket, IoPencil, IoTrash, IoChevronDown, IoFilter } from "react-icons/io5";
 import { Listbox, Transition } from '@headlessui/react';
 import {
     fetchTicketsStart, fetchTicketsSuccess, fetchTicketsFailure,
@@ -18,6 +18,10 @@ import ConfirmationModal from '../components/ConfirmationModal';
 import AssigneesModal from '../components/AssigneesModal';
 import StatusBadge from '../components/StatusBadge';
 import { format } from 'date-fns';
+import SkeletonLoader from '../components/SkeletonLoader';
+import EmptyState from '../components/EmptyState';
+import TimeTrackingModal from '../components/TimeTrackingModal';
+import { IoAdd, IoSearch, IoTicket, IoPencil, IoTrash, IoChevronDown, IoFilter, IoTime } from "react-icons/io5";
 
 const SORT_OPTIONS = [
     { name: 'Newest First', value: 'createdAt', order: 'desc' },
@@ -31,7 +35,7 @@ const PRIORITY_OPTIONS = ['Low', 'Medium', 'High', 'Critical'];
 const FilterDropdown = ({ title, value, options, onChange, clearable }) => (
     <Listbox value={value} onChange={onChange}>
         <div className="relative mt-1">
-            <Listbox.Button className="relative w-full cursor-default rounded-lg bg-white dark:bg-[#1e1e1e] py-2.5 pl-3 pr-10 text-left border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500/50 sm:text-sm shadow-sm transition-all hover:border-gray-300 dark:hover:border-gray-600">
+            <Listbox.Button className="relative w-full cursor-default rounded-2xl bg-white dark:bg-slate-800 py-3 pl-4 pr-10 text-left border border-slate-200 dark:border-white/5 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-[10px] font-black uppercase tracking-widest shadow-sm transition-all hover:bg-slate-50 dark:hover:bg-slate-700">
                 <span className={`block truncate ${!value ? 'text-gray-500' : 'text-gray-900 dark:text-gray-200'}`}>
                     {value?.name || value || title}
                 </span>
@@ -45,7 +49,7 @@ const FilterDropdown = ({ title, value, options, onChange, clearable }) => (
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
             >
-                <Listbox.Options className="absolute z-20 mt-1 max-h-60 w-full min-w-[160px] overflow-auto rounded-xl bg-white dark:bg-[#1e1e1e] py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm border border-gray-100 dark:border-gray-800">
+                <Listbox.Options className="absolute z-20 mt-2 max-h-60 w-full min-w-[200px] overflow-auto rounded-2xl bg-white dark:bg-slate-800 py-2 text-xs shadow-2xl focus:outline-none border border-slate-200 dark:border-white/5">
                     {clearable && (
                         <Listbox.Option
                             className={({ active }) =>
@@ -95,6 +99,8 @@ const TicketsPage = () => {
     const [ticketToDelete, setTicketToDelete] = useState(null);
     const [assigneesModalOpen, setAssigneesModalOpen] = useState(false);
     const [currentAssignees, setCurrentAssignees] = useState([]);
+    const [timeModalOpen, setTimeModalOpen] = useState(false);
+    const [ticketToLogTime, setTicketToLogTime] = useState(null);
 
     const handleEditClick = (ticket) => {
         setTicketToEdit(ticket);
@@ -262,6 +268,16 @@ const TicketsPage = () => {
                 cell: (info) => (
                     <div className="flex items-center gap-2">
                         <button
+                            onClick={() => {
+                                setTicketToLogTime(info.row.original);
+                                setTimeModalOpen(true);
+                            }}
+                            className="p-1.5 text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 rounded-md transition-colors"
+                            title="Log Time"
+                        >
+                            <IoTime size={18} />
+                        </button>
+                        <button
                             onClick={() => handleEditClick(info.row.original)}
                             className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
                             title="Edit"
@@ -298,34 +314,42 @@ const TicketsPage = () => {
     });
 
     return (
-        <div className="p-4 sm:p-6 max-h-screen overflow-hidden flex flex-col h-full">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
+        <div className="h-full flex flex-col p-8 space-y-6 bg-transparent overflow-hidden">
+            {/* Page Header - Fixed */}
+            <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 flex-shrink-0"
+            >
                 <div>
-                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white mb-1 sm:mb-2">Tickets</h1>
-                    <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">Manage and track issues</p>
+                    <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+                        Tickets
+                    </h1>
+                    <p className="text-gray-500 dark:text-neutral-400 font-medium">Manage and track your project issues with AI precision.</p>
                 </div>
                 <motion.button
-                    whileHover={{ scale: 1.05 }}
+                    whileHover={{ scale: 1.05, boxShadow: '0 20px 25px -5px rgba(59, 130, 246, 0.4)' }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => {
                         setTicketToEdit(null);
                         setIsDrawerOpen(true);
                     }}
-                    className="flex items-center gap-2 bg-[#007bff] hover:bg-[#0069d9] text-white px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg shadow-lg shadow-blue-500/20 transition-all font-medium text-sm sm:text-base w-full sm:w-auto justify-center"
+                    className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-6 py-3 rounded-2xl shadow-xl transition-all font-bold text-sm min-w-[160px] justify-center"
                 >
-                    <IoAdd size={20} />
+                    <IoAdd size={24} />
                     New Ticket
                 </motion.button>
-            </div>
+            </motion.div>
 
-            <div className="mb-6 sm:mb-8 flex flex-col xl:flex-row gap-4 justify-between items-start xl:items-center">
-                <div className="relative w-full xl:w-96">
-                    <IoSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            {/* Filter Section - Fixed */}
+            <div className="flex flex-col xl:flex-row gap-6 justify-between items-start xl:items-center flex-shrink-0">
+                <div className="glass-card relative w-full xl:w-96 rounded-2xl">
+                    <IoSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
                         value={globalFilter ?? ''}
                         onChange={(e) => setGlobalFilter(e.target.value)}
                         placeholder="Search tickets by title..."
-                        className="w-full bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 rounded-lg pl-10 pr-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-gray-700 dark:text-gray-200 transition-all shadow-sm focus:border-blue-500"
+                        className="w-full bg-transparent border-none rounded-2xl pl-12 pr-4 py-3.5 outline-none text-gray-700 dark:text-gray-200 transition-all placeholder:text-gray-400 font-medium"
                     />
                 </div>
 
@@ -343,25 +367,25 @@ const TicketsPage = () => {
                             Clear All
                         </button>
                     )}
-                    <div className="w-full sm:w-40">
+                    <div className="w-48">
                         <FilterDropdown
-                            title="Status"
+                            title="Operation Status"
                             value={statusFilter}
                             options={STATUS_OPTIONS}
                             onChange={setStatusFilter}
                             clearable
                         />
                     </div>
-                    <div className="w-full sm:w-40">
+                    <div className="w-48">
                         <FilterDropdown
-                            title="Priority"
+                            title="Node Priority"
                             value={priorityFilter}
                             options={PRIORITY_OPTIONS}
                             onChange={setPriorityFilter}
                             clearable
                         />
                     </div>
-                    <div className="w-full sm:w-48">
+                    <div className="w-48">
                         <FilterDropdown
                             title="Sort By"
                             value={sortConfig}
@@ -372,67 +396,86 @@ const TicketsPage = () => {
                 </div>
             </div>
 
-            <div className="flex-1 overflow-auto bg-white dark:bg-[#1e1e1e] rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm w-full overflow-x-auto">
-                <table className="w-full text-left border-collapse min-w-[800px]">
-                    <thead className="bg-gray-50 dark:bg-[#252526] sticky top-0 z-10">
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <tr key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => (
-                                    <th
-                                        key={header.id}
-                                        className="p-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800"
-                                    >
+            {/* Table Area - Scrollable */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="glass-card rounded-3xl border border-white/5 shadow-2xl overflow-hidden flex-1 min-h-0 flex flex-col"
+            >
+                <div className="overflow-auto scrollbar-hide flex-1">
+                    <table className="w-full text-left min-w-[1000px]">
+                        <thead className="sticky top-0 z-10">
+                            <tr className="border-b border-white/5 bg-slate-50 dark:bg-slate-800/80 backdrop-blur-md">
+                                {table.getHeaderGroups()[0].headers.map((header) => (
+                                    <th key={header.id} className="p-6 text-[10px] font-black text-gray-500 uppercase tracking-widest">
                                         {flexRender(header.column.columnDef.header, header.getContext())}
                                     </th>
                                 ))}
                             </tr>
-                        ))}
-                    </thead>
-                    <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                        {isLoading ? (
-                            <tr>
-                                <td colSpan={columns.length} className="p-8 text-center text-gray-500">
-                                    Loading tickets...
-                                </td>
-                            </tr>
-                        ) : table.getRowModel().rows.length === 0 ? (
-                            <tr>
-                                <td colSpan={columns.length} className="p-8 text-center text-gray-500">
-                                    No tickets found.
-                                </td>
-                            </tr>
-                        ) : (
-                            table.getRowModel().rows.map((row) => (
-                                <tr key={row.id} className="hover:bg-gray-50 dark:hover:bg-[#2a2d2e] transition-colors">
-                                    {row.getVisibleCells().map((cell) => (
-                                        <td key={cell.id} className="p-4 text-sm whitespace-nowrap">
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                        </td>
-                                    ))}
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                            {isLoading ? (
+                                <tr>
+                                    <td colSpan={columns.length} className="p-4">
+                                        <SkeletonLoader.Table rows={10} cols={6} />
+                                    </td>
                                 </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
-            </div>
+                            ) : table.getRowModel().rows.length === 0 ? (
+                                <tr>
+                                    <td colSpan={columns.length} className="p-8">
+                                        <EmptyState
+                                            title="No tickets found"
+                                            description="Try adjusting your filters or create a new ticket to get started."
+                                            icon={<IoTicket className="text-gray-400" />}
+                                            action={
+                                                <button
+                                                    onClick={() => {
+                                                        setTicketToEdit(null);
+                                                        setIsDrawerOpen(true);
+                                                    }}
+                                                    className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
+                                                >
+                                                    Create Ticket
+                                                </button>
+                                            }
+                                        />
+                                    </td>
+                                </tr>
+                            ) : (
+                                table.getRowModel().rows.map((row) => (
+                                    <tr key={row.id} className="hover:bg-gray-50 dark:hover:bg-[#2a2d2e] transition-colors">
+                                        {row.getVisibleCells().map((cell) => (
+                                            <td key={cell.id} className="p-6 text-sm whitespace-nowrap">
+                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </motion.div>
 
-            <div className="flex items-center justify-end gap-2 mt-4">
+            {/* Pagination Hub - Fixed At Bottom */}
+            <div className="flex items-center justify-end gap-3 flex-shrink-0">
                 <button
-                    className="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded disabled:opacity-50"
+                    className="p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl disabled:opacity-20 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm"
                     onClick={() => table.previousPage()}
                     disabled={!table.getCanPreviousPage()}
                 >
-                    {'<'}
+                    <IoChevronDown size={20} className="rotate-90 text-slate-500" />
                 </button>
-                <span className="text-sm text-gray-500">
-                    Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
-                </span>
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-6 py-3 rounded-2xl text-[10px] font-black text-slate-500 tracking-widest uppercase shadow-sm">
+                    Registry <span className="text-blue-600 dark:text-blue-500 mx-1">{table.getState().pagination.pageIndex + 1}</span> / {table.getPageCount() || 1}
+                </div>
                 <button
-                    className="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded disabled:opacity-50"
+                    className="p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl disabled:opacity-20 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm"
                     onClick={() => table.nextPage()}
                     disabled={!table.getCanNextPage()}
                 >
-                    {'>'}
+                    <IoChevronDown size={20} className="-rotate-90 text-slate-500" />
                 </button>
             </div>
 
@@ -457,6 +500,12 @@ const TicketsPage = () => {
                 isOpen={assigneesModalOpen}
                 onClose={() => setAssigneesModalOpen(false)}
                 assignees={currentAssignees}
+            />
+
+            <TimeTrackingModal
+                open={timeModalOpen}
+                onClose={() => setTimeModalOpen(false)}
+                ticket={ticketToLogTime}
             />
         </div>
     );

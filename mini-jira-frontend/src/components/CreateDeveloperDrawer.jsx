@@ -19,13 +19,12 @@ const CreateDeveloperDrawer = ({ open, onClose, userToEdit }) => {
         role: USER_ROLES.DEVELOPER
     });
 
-    // Populate form when editing
     useEffect(() => {
         if (userToEdit) {
             setFormData({
                 name: userToEdit.name || '',
                 email: userToEdit.email || '',
-                password: '', // Don't pre-fill password
+                password: '',
                 role: userToEdit.role || USER_ROLES.DEVELOPER
             });
         } else {
@@ -46,11 +45,9 @@ const CreateDeveloperDrawer = ({ open, onClose, userToEdit }) => {
         e.preventDefault();
 
         if (isEditMode) {
-            // Update existing user
             dispatch(updateUserStart());
             try {
                 const updatedData = { ...formData };
-                // Remove password if empty (don't update password)
                 if (!updatedData.password) {
                     delete updatedData.password;
                 }
@@ -62,7 +59,6 @@ const CreateDeveloperDrawer = ({ open, onClose, userToEdit }) => {
                 dispatch(updateUserFailure(msg));
             }
         } else {
-            // Create new user
             dispatch(createUserStart());
             try {
                 const newUser = await userService.registerUser(formData);
@@ -82,96 +78,117 @@ const CreateDeveloperDrawer = ({ open, onClose, userToEdit }) => {
             open={open}
             onClose={onClose}
             PaperProps={{
-                sx: { width: { xs: '100%', sm: 400 } }
+                sx: {
+                    width: { xs: '100%', sm: 450 },
+                    background: 'transparent',
+                    boxShadow: 'none'
+                }
             }}
         >
-            <div className="h-full flex flex-col p-6 bg-white dark:bg-[#1e1e1e] text-gray-900 dark:text-white transition-colors duration-200">
-                <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                        {isEditMode ? 'Edit Developer' : 'New Developer'}
-                    </h2>
-                    <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors text-gray-500 dark:text-gray-400">
+            <div className="h-full flex flex-col bg-white dark:bg-slate-950 shadow-2xl border-l border-slate-200 dark:border-slate-800 overflow-hidden">
+                <div className="px-8 py-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900/50">
+                    <div>
+                        <h2 className="text-2xl font-black text-slate-900 dark:text-white leading-tight">
+                            {isEditMode ? 'Modify Entity' : 'New Entity'}
+                        </h2>
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Personnel registry and access</p>
+                    </div>
+                    <button
+                        onClick={onClose}
+                        className="p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-400 hover:text-rose-500 transition-all"
+                    >
                         <IoClose size={24} />
                     </button>
                 </div>
 
-                {isError && (
-                    <div className="bg-red-50 text-red-600 border border-red-200 px-4 py-3 rounded-lg mb-6 text-sm dark:bg-red-900/20 dark:text-red-300 dark:border-red-900/30">
-                        {message}
-                    </div>
-                )}
+                <div className="relative flex-1 px-8 py-8 overflow-y-auto scrollbar-hide">
+                    {isError && (
+                        <div className="mb-6 p-4 bg-rose-50 dark:bg-rose-500/10 border border-rose-100 dark:border-rose-500/20 rounded-2xl text-rose-600 dark:text-rose-500 text-sm font-bold flex items-center gap-3">
+                            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+                            {message}
+                        </div>
+                    )}
 
-                <form onSubmit={handleSubmit} className="flex flex-col gap-5 flex-1">
-                    <div className="space-y-1.5">
-                        <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Full Name</label>
-                        <input
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            required
-                            className="w-full bg-white dark:bg-[#2c2c2c] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all placeholder-gray-400 dark:placeholder-gray-500"
-                            placeholder="John Doe"
-                        />
-                    </div>
+                    <form onSubmit={handleSubmit} className="flex flex-col gap-6 h-full">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
+                                Biological ID
+                            </label>
+                            <input
+                                name="name"
+                                value={formData.name}
+                                onChange={handleChange}
+                                required
+                                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold placeholder:text-slate-400 transition-all"
+                                placeholder="Full name of target..."
+                            />
+                        </div>
 
-                    <div className="space-y-1.5">
-                        <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Email Address</label>
-                        <input
-                            name="email"
-                            type="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                            className="w-full bg-white dark:bg-[#2c2c2c] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all placeholder-gray-400 dark:placeholder-gray-500"
-                            placeholder="john@example.com"
-                        />
-                    </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
+                                Neural Signal (Email)
+                            </label>
+                            <input
+                                name="email"
+                                type="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                required
+                                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold placeholder:text-slate-400 transition-all"
+                                placeholder="primary@signal.corp"
+                            />
+                        </div>
 
-                    <div className="space-y-1.5">
-                        <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Password</label>
-                        <input
-                            name="password"
-                            type="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            required={!isEditMode}
-                            className="w-full bg-white dark:bg-[#2c2c2c] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all placeholder-gray-400 dark:placeholder-gray-500"
-                            placeholder={isEditMode ? "Leave blank to keep current password" : "••••••••"}
-                        />
-                    </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
+                                Encryption Key (Password)
+                            </label>
+                            <input
+                                name="password"
+                                type="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                required={!isEditMode}
+                                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold placeholder:text-slate-400 transition-all"
+                                placeholder={isEditMode ? "Leave blank to maintain key" : "••••••••"}
+                            />
+                        </div>
 
-                    <div className="space-y-1.5">
-                        <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Role</label>
-                        <select
-                            name="role"
-                            value={formData.role}
-                            onChange={handleChange}
-                            className="w-full bg-white dark:bg-[#2c2c2c] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500"
-                        >
-                            <option value={USER_ROLES.DEVELOPER}>Developer</option>
-                            <option value={USER_ROLES.MANAGER}>Manager</option>
-                        </select>
-                    </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
+                                Access Clearance
+                            </label>
+                            <select
+                                name="role"
+                                value={formData.role}
+                                onChange={handleChange}
+                                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold appearance-none transition-all"
+                            >
+                                <option value={USER_ROLES.DEVELOPER} className="dark:bg-slate-900">Developer (Standard)</option>
+                                <option value={USER_ROLES.MANAGER} className="dark:bg-slate-900">Manager (Admin)</option>
+                            </select>
+                        </div>
 
-                    <div className="mt-auto pt-6 flex flex-col gap-3">
-                        <motion.button
-                            whileHover={{ scale: 1.01 }}
-                            whileTap={{ scale: 0.99 }}
-                            type="submit"
-                            disabled={isLoading}
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg shadow-sm hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {isLoading ? (isEditMode ? 'Updating...' : 'Creating...') : (isEditMode ? 'Update Developer' : 'Create Developer')}
-                        </motion.button>
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="w-full py-3 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors font-medium border border-gray-200 dark:border-gray-700"
-                        >
-                            Cancel
-                        </button>
-                    </div>
-                </form>
+                        <div className="mt-auto pt-8 flex flex-col gap-4">
+                            <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                type="submit"
+                                disabled={isLoading}
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black text-[10px] uppercase tracking-[0.2em] py-4 rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-500/10"
+                            >
+                                {isLoading ? (isEditMode ? 'Re-syncing...' : 'Initializing...') : (isEditMode ? 'Authorize Changes' : 'Register Entity')}
+                            </motion.button>
+                            <button
+                                type="button"
+                                onClick={onClose}
+                                className="w-full py-4 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-black text-[10px] uppercase tracking-[0.2em] hover:bg-slate-200 dark:hover:bg-slate-800 rounded-2xl transition-all"
+                            >
+                                Abort
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </Drawer>
     );

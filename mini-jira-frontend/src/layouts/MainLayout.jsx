@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { styled, useTheme } from '@mui/material/styles';
+import { styled, useTheme, createTheme, ThemeProvider } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
 import MuiAppBar from '@mui/material/AppBar';
@@ -21,6 +21,8 @@ import MailIcon from '@mui/icons-material/Mail';
 import PeopleIcon from '@mui/icons-material/People';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
+import ViewWeekIcon from '@mui/icons-material/ViewWeek';
+import HistoryIcon from '@mui/icons-material/History';
 import { Outlet, NavLink } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
 import Menu from '@mui/material/Menu';
@@ -28,6 +30,11 @@ import MenuItem from '@mui/material/MenuItem';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../store/slices/authSlice';
+import ThemeToggle from '../components/ThemeToggle';
+import AICopilotSidebar from '../components/AICopilotSidebar';
+import { IoSparkles } from 'react-icons/io5';
+import { motion } from 'framer-motion';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 const drawerWidth = 240;
 
@@ -38,6 +45,8 @@ const openedMixin = (theme) => ({
         duration: theme.transitions.duration.enteringScreen,
     }),
     overflowX: 'hidden',
+    backgroundColor: theme.palette.mode === 'light' ? '#ffffff' : '#020617',
+    borderRight: `1px solid ${theme.palette.divider}`,
 });
 
 const closedMixin = (theme) => ({
@@ -46,6 +55,8 @@ const closedMixin = (theme) => ({
         duration: theme.transitions.duration.leavingScreen,
     }),
     overflowX: 'hidden',
+    backgroundColor: theme.palette.mode === 'light' ? '#ffffff' : '#020617',
+    borderRight: `1px solid ${theme.palette.divider}`,
     width: `calc(${theme.spacing(7)} + 1px)`,
     [theme.breakpoints.up('sm')]: {
         width: `calc(${theme.spacing(8)} + 1px)`,
@@ -62,51 +73,40 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 const AppBar = styled(MuiAppBar, {
     shouldForwardProp: (prop) => prop !== 'open',
-})(({ theme }) => ({
+})(({ theme, open }) => ({
     zIndex: theme.zIndex.drawer + 1,
+    backgroundColor: theme.palette.mode === 'light' ? '#ffffff' : '#020617',
+    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+    borderBottom: `1px solid ${theme.palette.divider}`,
+    backgroundImage: 'none',
     transition: theme.transitions.create(['width', 'margin'], {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.leavingScreen,
     }),
-    variants: [
-        {
-            props: ({ open }) => open,
-            style: {
-                marginLeft: drawerWidth,
-                width: `calc(100% - ${drawerWidth}px)`,
-                transition: theme.transitions.create(['width', 'margin'], {
-                    easing: theme.transitions.easing.sharp,
-                    duration: theme.transitions.duration.enteringScreen,
-                }),
-            },
-        },
-    ],
+    ...(open && {
+        marginLeft: drawerWidth,
+        width: `calc(100% - ${drawerWidth}px)`,
+        transition: theme.transitions.create(['width', 'margin'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
+    }),
 }));
 
-import useMediaQuery from '@mui/material/useMediaQuery';
-
 const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
-    ({ theme }) => ({
+    ({ theme, open }) => ({
         width: drawerWidth,
         flexShrink: 0,
         whiteSpace: 'nowrap',
         boxSizing: 'border-box',
-        variants: [
-            {
-                props: ({ open }) => open,
-                style: {
-                    ...openedMixin(theme),
-                    '& .MuiDrawer-paper': openedMixin(theme),
-                },
-            },
-            {
-                props: ({ open }) => !open,
-                style: {
-                    ...closedMixin(theme),
-                    '& .MuiDrawer-paper': closedMixin(theme),
-                },
-            },
-        ],
+        ...(open && {
+            ...openedMixin(theme),
+            '& .MuiDrawer-paper': openedMixin(theme),
+        }),
+        ...(!open && {
+            ...closedMixin(theme),
+            '& .MuiDrawer-paper': closedMixin(theme),
+        }),
     }),
 );
 
@@ -117,48 +117,32 @@ const DrawerMenu = ({ items, open }) => (
                 <ListItemButton
                     component={NavLink}
                     to={item.path}
-                    sx={[
-                        {
-                            minHeight: 48,
-                            px: 2.5,
-                        },
-                        open
-                            ? {
-                                justifyContent: 'initial',
-                            }
-                            : {
-                                justifyContent: 'center',
-                            },
-                    ]}
+                    sx={{
+                        minHeight: 48,
+                        px: 2.5,
+                        justifyContent: open ? 'initial' : 'center',
+                    }}
                 >
                     <ListItemIcon
-                        sx={[
-                            {
-                                minWidth: 0,
-                                justifyContent: 'center',
-                            },
-                            open
-                                ? {
-                                    mr: 3,
-                                }
-                                : {
-                                    mr: 'auto',
-                                },
-                        ]}
+                        sx={{
+                            minWidth: 0,
+                            mr: open ? 3 : 'auto',
+                            justifyContent: 'center',
+                            color: 'inherit'
+                        }}
                     >
                         {item.icon ? item.icon : (index % 2 === 0 ? <InboxIcon /> : <MailIcon />)}
                     </ListItemIcon>
                     <ListItemText
                         primary={item.label}
-                        sx={[
-                            open
-                                ? {
-                                    opacity: 1,
-                                }
-                                : {
-                                    opacity: 0,
-                                },
-                        ]}
+                        sx={{
+                            '& .MuiListItemText-primary': {
+                                fontWeight: 700,
+                                fontSize: '0.9rem',
+                                color: 'inherit'
+                            },
+                            opacity: open ? 1 : 0
+                        }}
                     />
                 </ListItemButton>
             </ListItem>
@@ -167,12 +151,83 @@ const DrawerMenu = ({ items, open }) => (
 );
 
 export default function MiniDrawer() {
+    const [mode, setMode] = React.useState(() => {
+        return localStorage.getItem('theme') || 'light';
+    });
+
+    const muiTheme = React.useMemo(
+        () =>
+            createTheme({
+                palette: {
+                    mode,
+                    primary: {
+                        main: '#3b82f6',
+                    },
+                    background: {
+                        default: mode === 'light' ? '#f8fafc' : '#030712',
+                        paper: mode === 'light' ? '#ffffff' : '#0f172a',
+                    },
+                    divider: mode === 'light' ? '#e2e8f0' : '#1e293b',
+                },
+                components: {
+                    MuiPaper: {
+                        styleOverrides: {
+                            root: {
+                                backgroundImage: 'none',
+                            }
+                        }
+                    },
+                    MuiAppBar: {
+                        styleOverrides: {
+                            root: {
+                                color: mode === 'light' ? '#1e293b' : '#f1f5f9',
+                            }
+                        }
+                    },
+                    MuiListItemButton: {
+                        styleOverrides: {
+                            root: {
+                                borderRadius: '12px',
+                                margin: '4px 12px',
+                                '&.active': {
+                                    backgroundColor: mode === 'light' ? '#eff6ff' : '#1e293b',
+                                    color: '#3b82f6',
+                                    '& .MuiListItemIcon-root': {
+                                        color: '#3b82f6',
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                typography: {
+                    fontFamily: "'Inter', 'Outfit', sans-serif",
+                },
+            }),
+        [mode]
+    );
+
+    React.useEffect(() => {
+        const isDark = document.documentElement.classList.contains('dark');
+        setMode(isDark ? 'dark' : 'light');
+
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.attributeName === 'class') {
+                    const isDarkNow = document.documentElement.classList.contains('dark');
+                    setMode(isDarkNow ? 'dark' : 'light');
+                }
+            });
+        });
+
+        observer.observe(document.documentElement, { attributes: true });
+        return () => observer.disconnect();
+    }, []);
+
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-    // Initialize open state based on device type and localStorage
     const [open, setOpen] = React.useState(() => {
-        // Always closed on mobile by default
-        if (window.innerWidth < 600) return false;
+        if (window.innerWidth < 610) return false;
         return localStorage.getItem('sidebarOpen') === 'true';
     });
 
@@ -180,8 +235,8 @@ export default function MiniDrawer() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { user } = useSelector((state) => state.auth);
+    const [isCopilotOpen, setIsCopilotOpen] = React.useState(false);
 
-    // Sync open state when switching between mobile/desktop
     React.useEffect(() => {
         if (isMobile) {
             setOpen(false);
@@ -194,6 +249,8 @@ export default function MiniDrawer() {
         { label: 'Dashboard', path: '/app/dashboard', icon: <InboxIcon /> },
         { label: 'Projects', path: '/app/projects', icon: <AccountTreeIcon /> },
         { label: 'Tickets', path: '/app/tickets', icon: <ConfirmationNumberIcon /> },
+        { label: 'Kanban Board', path: '/app/kanban-board', icon: <ViewWeekIcon /> },
+        { label: 'Timeline', path: '/app/timeline', icon: <HistoryIcon /> },
         { label: 'Developers', path: '/app/developers', icon: <PeopleIcon /> },
     ];
 
@@ -207,13 +264,8 @@ export default function MiniDrawer() {
         if (!isMobile) localStorage.setItem('sidebarOpen', 'false');
     };
 
-    const handleMenuOpen = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-    };
+    const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
+    const handleMenuClose = () => setAnchorEl(null);
 
     const handleLogout = () => {
         dispatch(logout());
@@ -227,47 +279,55 @@ export default function MiniDrawer() {
     };
 
     const drawerContent = (
-        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+        <Box
+            className="glass-sidebar"
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+            }}
+        >
             <DrawerHeader>
-                {/* On mobile, or when open on desktop, show the logo/text */}
                 {(open || isMobile) && (
                     <Box sx={{ flexGrow: 1, ml: 2, display: 'flex', flexDirection: 'column' }}>
                         <Typography
                             variant="h6"
                             sx={{
-                                fontWeight: 700,
-                                background: 'linear-gradient(45deg, #00c6ff 30%, #0072ff 90%)',
+                                fontWeight: 900,
+                                background: 'linear-gradient(45deg, #3b82f6 30%, #6366f1 90%)',
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent',
                                 letterSpacing: '0.5px',
-                                lineHeight: 1.2
+                                lineHeight: 1.2,
+                                textTransform: 'uppercase'
                             }}
                         >
-                            Detroit
+                            Xetabots
                         </Typography>
                         <Typography
                             variant="caption"
                             sx={{
-                                fontWeight: 500,
-                                color: 'text.secondary',
-                                letterSpacing: '0.5px',
+                                fontWeight: 800,
+                                color: mode === 'light' ? '#64748b' : '#94a3b8',
+                                letterSpacing: '1px',
+                                textTransform: 'uppercase',
+                                fontSize: '0.6rem',
                                 lineHeight: 1,
-                                mt: -0.5
+                                mt: -0.2
                             }}
                         >
-                            we code a success
+                            System Control
                         </Typography>
                     </Box>
                 )}
-                <IconButton onClick={handleDrawerClose}>
+                <IconButton onClick={handleDrawerClose} sx={{ color: 'inherit' }}>
                     {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
                 </IconButton>
             </DrawerHeader>
             <Divider />
-            {/* Pass open=true to DrawerMenu on mobile so labels always show when drawer is open */}
             <DrawerMenu open={isMobile ? true : open} items={drawerItems} />
 
-            {/* Sidebar Footer */}
             <Box sx={{
                 marginTop: 'auto',
                 p: (open || isMobile) ? 2 : 1,
@@ -280,58 +340,32 @@ export default function MiniDrawer() {
                             display: 'flex',
                             alignItems: 'center',
                             gap: 1.5,
-                            mb: 1.5,
-                            p: 1,
-                            borderRadius: 2,
-                            bgcolor: 'action.hover',
+                            p: 1.5,
+                            borderRadius: '16px',
+                            bgcolor: mode === 'light' ? '#f8fafc' : '#0f172a',
+                            border: '1px solid',
+                            borderColor: 'divider',
                         }}>
                             <Avatar
                                 sx={{
                                     width: 36,
                                     height: 36,
                                     bgcolor: user?.role?.toLowerCase() === 'manager' ? '#f59e0b' : '#3b82f6',
-                                    fontSize: '0.9rem',
-                                    fontWeight: 600,
+                                    fontWeight: 800,
+                                    fontSize: '0.85rem'
                                 }}
                             >
                                 {user?.name?.charAt(0).toUpperCase() || 'U'}
                             </Avatar>
                             <Box sx={{ flex: 1, minWidth: 0 }}>
-                                <Typography
-                                    variant="body2"
-                                    sx={{
-                                        fontWeight: 600,
-                                        fontSize: '0.875rem',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        whiteSpace: 'nowrap',
-                                    }}
-                                >
+                                <Typography variant="body2" sx={{ fontWeight: 800, fontSize: '0.8rem', color: 'text.primary' }}>
                                     {user?.name || 'User'}
                                 </Typography>
-                                <Typography
-                                    variant="caption"
-                                    sx={{
-                                        color: 'text.secondary',
-                                        fontSize: '0.75rem',
-                                    }}
-                                >
+                                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase', fontSize: '0.65rem' }}>
                                     {user?.role || 'Developer'}
                                 </Typography>
                             </Box>
                         </Box>
-                        <Divider sx={{ my: 1 }} />
-                        <Typography
-                            variant="caption"
-                            sx={{
-                                display: 'block',
-                                textAlign: 'center',
-                                color: 'text.secondary',
-                                fontSize: '0.7rem',
-                            }}
-                        >
-                            v1.0.0 • © 2025 Detroit
-                        </Typography>
                     </Box>
                 ) : (
                     <Box sx={{ display: 'flex', justifyContent: 'center' }}>
@@ -340,7 +374,8 @@ export default function MiniDrawer() {
                                 width: 32,
                                 height: 32,
                                 bgcolor: user?.role?.toLowerCase() === 'manager' ? '#f59e0b' : '#3b82f6',
-                                fontSize: '0.85rem',
+                                fontWeight: 800,
+                                fontSize: '0.8rem'
                             }}
                         >
                             {user?.name?.charAt(0).toUpperCase() || 'U'}
@@ -352,134 +387,156 @@ export default function MiniDrawer() {
     );
 
     return (
-        <Box sx={{ display: 'flex' }}>
-            <CssBaseline />
-            <AppBar position="fixed" open={open && !isMobile} sx={{ backgroundColor: theme.palette.primary.dark }}>
-                <Toolbar>
-                    <IconButton
-                        color="inherit"
-                        aria-label="open drawer"
-                        onClick={handleDrawerOpen}
-                        edge="start"
-                        sx={[
-                            {
-                                marginRight: 5,
-                            },
-                            (open && !isMobile) && { display: 'none' },
-                        ]}
-                    >
-                        <MenuIcon />
-                    </IconButton>
-                    <Typography
-                        variant="h6"
-                        noWrap
-                        component="div"
-                        sx={{ flexGrow: 1, letterSpacing: 0.5, fontWeight: 600 }}
-                    >
-                        Mini Jira
-                    </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Box sx={{ textAlign: 'right', display: { xs: 'none', sm: 'block' } }}>
-                            <Typography
-                                variant="body1"
-                                sx={{ fontWeight: 600, lineHeight: 1.2, color: 'white' }}
-                            >
-                                {user?.name || 'User'}
-                            </Typography>
-                            <Typography
-                                variant="caption"
-                                sx={{
-                                    fontWeight: 600,
-                                    textTransform: 'uppercase',
-                                    fontSize: '0.7rem',
-                                    letterSpacing: '0.5px',
-                                    color: user?.role?.toLowerCase() === 'manager' ? '#fbbf24' : '#22d3ee'
-                                }}
-                            >
-                                {user?.role || 'Developer'}
-                            </Typography>
-                        </Box>
+        <ThemeProvider theme={muiTheme}>
+            <Box sx={{ display: 'flex' }} className="min-h-screen bg-slate-50 dark:bg-[#030712] transition-colors duration-500">
+                <CssBaseline />
+                <AppBar position="fixed" open={open} elevation={0}>
+                    <Toolbar>
                         <IconButton
                             color="inherit"
-                            onClick={handleMenuOpen}
+                            aria-label="open drawer"
+                            onClick={handleDrawerOpen}
+                            edge="start"
+                            sx={[
+                                { marginRight: 5 },
+                                (open && !isMobile) && { display: 'none' },
+                            ]}
+                        >
+                            <MenuIcon />
+                        </IconButton>
+                        <Typography
+                            variant="h6"
+                            noWrap
+                            component="div"
                             sx={{
-                                p: 0.5,
-                                borderRadius: '50%',
-                                border: '2px solid rgba(255,255,255,0.3)',
-                                transition: 'all 0.3s',
-                                '&:hover': {
-                                    borderColor: 'rgba(255,255,255,0.6)',
-                                    transform: 'scale(1.05)'
+                                flexGrow: 1,
+                                fontWeight: 900,
+                                textTransform: 'uppercase',
+                                letterSpacing: '2px',
+                                fontSize: '0.9rem',
+                                color: 'inherit'
+                            }}
+                        >
+                            Xetabots Hub
+                        </Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => setIsCopilotOpen(!isCopilotOpen)}
+                                className={`p-2.5 rounded-xl transition-all ${isCopilotOpen
+                                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
+                                    }`}
+                                title="Xetabots AI Assistant"
+                            >
+                                <IoSparkles size={18} />
+                            </motion.button>
+
+                            <Box sx={{ textAlign: 'right', display: { xs: 'none', sm: 'block' } }}>
+                                <Typography variant="body1" sx={{ fontWeight: 800, lineHeight: 1, fontSize: '0.8rem' }}>
+                                    {user?.name || 'User'}
+                                </Typography>
+                                <Typography
+                                    variant="caption"
+                                    sx={{
+                                        fontWeight: 900,
+                                        textTransform: 'uppercase',
+                                        fontSize: '0.6rem',
+                                        letterSpacing: '0.5px',
+                                        color: user?.role?.toLowerCase() === 'manager' ? '#f59e0b' : '#3b82f6',
+                                    }}
+                                >
+                                    {user?.role || 'Developer'}
+                                </Typography>
+                            </Box>
+
+                            <IconButton
+                                onClick={handleMenuOpen}
+                                sx={{
+                                    p: 0.5,
+                                    border: '1px solid',
+                                    borderColor: 'divider',
+                                    '&:hover': { transform: 'scale(1.05)' }
+                                }}
+                            >
+                                <Avatar
+                                    sx={{
+                                        width: 34,
+                                        height: 34,
+                                        bgcolor: user?.role?.toLowerCase() === 'manager' ? '#f59e0b' : '#3b82f6',
+                                        fontWeight: 900,
+                                        fontSize: '0.8rem'
+                                    }}
+                                >
+                                    {user?.name?.charAt(0).toUpperCase() || 'U'}
+                                </Avatar>
+                            </IconButton>
+                        </Box>
+                        <Menu
+                            anchorEl={anchorEl}
+                            open={Boolean(anchorEl)}
+                            onClose={handleMenuClose}
+                            slotProps={{
+                                paper: {
+                                    sx: {
+                                        mt: 1.5,
+                                        minWidth: 220,
+                                        borderRadius: '16px',
+                                        border: '1px solid',
+                                        borderColor: 'divider',
+                                        boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+                                        bgcolor: mode === 'light' ? '#ffffff' : '#0f172a',
+                                    }
                                 }
                             }}
                         >
-                            <Avatar
-                                alt={user?.name || 'User'}
-                                sx={{
-                                    width: 40,
-                                    height: 40,
-                                    bgcolor: user?.role?.toLowerCase() === 'manager' ? '#f59e0b' : '#3b82f6',
-                                    fontWeight: 700,
-                                    fontSize: '1rem'
-                                }}
-                            >
-                                {user?.name?.charAt(0).toUpperCase() || 'U'}
-                            </Avatar>
-                        </IconButton>
-                    </Box>
-                    <Menu
-                        anchorEl={anchorEl}
-                        open={Boolean(anchorEl)}
-                        onClose={handleMenuClose}
-                        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                        PaperProps={{
-                            elevation: 4,
-                            sx: {
-                                mt: 1,
-                                minWidth: 180,
-                                borderRadius: 2,
-                                py: 0.5,
-                            },
+                            <Box sx={{ px: 2, py: 1.5, borderBottom: '1px solid', borderColor: 'divider' }}>
+                                <Typography variant="caption" sx={{ fontWeight: 900, textTransform: 'uppercase', color: 'text.secondary', fontSize: '0.6rem', letterSpacing: '1px' }}>
+                                    Account ID: #{user?._id?.slice(-6).toUpperCase() || 'OFFLINE'}
+                                </Typography>
+                            </Box>
+                            <MenuItem onClick={handleProfile} sx={{ fontSize: '0.8rem', fontWeight: 800, py: 1.5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                User Profile
+                            </MenuItem>
+                            <Divider />
+                            <MenuItem onClick={handleLogout} sx={{ fontSize: '0.8rem', fontWeight: 800, py: 1.5, color: '#ef4444', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                Sign Out
+                            </MenuItem>
+                        </Menu>
+                    </Toolbar>
+                </AppBar>
+
+                {isMobile ? (
+                    <MuiDrawer
+                        variant="temporary"
+                        open={open}
+                        onClose={handleDrawerClose}
+                        sx={{
+                            display: { xs: 'block', sm: 'none' },
+                            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
                         }}
                     >
-                        <MenuItem onClick={handleProfile} sx={{ fontSize: 14 }}>
-                            Profile
-                        </MenuItem>
-                        <MenuItem onClick={handleLogout} sx={{ fontSize: 14, color: 'error.main' }}>
-                            Logout
-                        </MenuItem>
-                    </Menu>
-                </Toolbar>
-            </AppBar>
+                        {drawerContent}
+                    </MuiDrawer>
+                ) : (
+                    <Drawer variant="permanent" open={open}>
+                        {drawerContent}
+                    </Drawer>
+                )}
 
-            {isMobile ? (
-                <MuiDrawer
-                    variant="temporary"
-                    open={open}
-                    onClose={handleDrawerClose}
-                    ModalProps={{
-                        keepMounted: true, // Better open performance on mobile.
-                    }}
-                    sx={{
-                        display: { xs: 'block', sm: 'none' },
-                        '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
-                    }}
-                >
-                    {drawerContent}
-                </MuiDrawer>
-            ) : (
-                <Drawer variant="permanent" open={open}>
-                    {drawerContent}
-                </Drawer>
-            )}
-
-            <Box component="main" sx={{ flexGrow: 1, height: '100vh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                <DrawerHeader />
-                <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
-                    <Outlet></Outlet>
+                <Box component="main" sx={{ flexGrow: 1, height: '100vh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                    <DrawerHeader />
+                    <Box sx={{ flexGrow: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', p: isMobile ? 2 : 4, backgroundColor: 'background.default' }}>
+                        <Outlet></Outlet>
+                    </Box>
                 </Box>
+
+                <AICopilotSidebar
+                    isOpen={isCopilotOpen}
+                    onClose={() => setIsCopilotOpen(false)}
+                />
             </Box>
-        </Box>
+        </ThemeProvider>
     );
 }

@@ -5,12 +5,15 @@ import { useSelector, useDispatch } from 'react-redux';
 import { loginStart, loginSuccess, loginFailure, reset } from '../../store/slices/authSlice';
 import authService from '../../services/authService';
 
+import { useToast } from '../../contexts/ToastContext';
+
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const { showToast } = useToast();
 
     const { user, isLoading, isError, message } = useSelector(
         (state) => state.auth
@@ -29,10 +32,12 @@ export default function Login() {
         try {
             const userData = await authService.login(email, password);
             dispatch(loginSuccess(userData));
+            showToast(`Welcome back!`, 'success');
             navigate("/app");
         } catch (error) {
             const msg = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
             dispatch(loginFailure(msg));
+            showToast(msg, 'error');
         }
     };
 
@@ -53,7 +58,7 @@ export default function Login() {
                         className="inline-block"
                     >
                         <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent mb-2">
-                            Detroit
+                            Xetabots
                         </h1>
                         <p className="text-gray-600 dark:text-gray-400 text-sm font-medium">
                             Project Management System
@@ -155,7 +160,7 @@ export default function Login() {
                     className="text-center mt-6"
                 >
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                        © 2025 Detroit. All rights reserved.
+                        © 2025 Xetabots. All rights reserved.
                     </p>
                 </motion.div>
             </motion.div>

@@ -24,15 +24,19 @@ api.interceptors.request.use(
     }
 );
 
-// Response interceptor to handle errors (e.g., global 401 handling could go here)
+// Response interceptor to handle errors (e.g., global 401 handling)
 api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response && error.response.status === 401) {
-            // Optional: Clear token and redirect to login if 401 occurs
-            // localStorage.removeItem('token');
-            // window.location.href = '/login'; 
-            // Commented out to avoid hard redirect loops during development/testing unless explicitly desired
+            // Clear token and user from localStorage
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+
+            // Redirect to login page
+            if (window.location.pathname !== '/login') {
+                window.location.href = '/login';
+            }
         }
         return Promise.reject(error);
     }

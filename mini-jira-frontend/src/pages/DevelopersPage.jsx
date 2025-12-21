@@ -3,15 +3,12 @@ import {
     useReactTable,
     getCoreRowModel,
     flexRender,
-    getPaginationRowModel,
-    getSortedRowModel,
-    getFilteredRowModel,
 } from '@tanstack/react-table';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUsersStart, fetchUsersSuccess, fetchUsersFailure } from '../store/slices/userSlice';
 import userService from '../services/userService';
 import { motion } from 'framer-motion';
-import { IoAdd, IoSearch, IoPerson, IoPencil } from "react-icons/io5";
+import { IoAdd, IoSearch, IoPerson, IoPencil, IoChevronDown } from "react-icons/io5";
 import CreateDeveloperDrawer from '../components/CreateDeveloperDrawer';
 import { USER_ROLES } from '../utils/constants';
 import { isManager as checkIsManager } from '../utils/userHelpers';
@@ -23,7 +20,6 @@ const DevelopersPage = () => {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [userToEdit, setUserToEdit] = useState(null);
 
-    // Check if user is a manager using utility function
     const isManagerUser = checkIsManager(user);
 
     const handleEditClick = (user) => {
@@ -36,7 +32,6 @@ const DevelopersPage = () => {
         setUserToEdit(null);
     };
 
-    // Table State
     const [globalFilter, setGlobalFilter] = useState('');
     const [roleFilter, setRoleFilter] = useState('');
     const [{ pageIndex, pageSize }, setPagination] = useState({
@@ -53,19 +48,16 @@ const DevelopersPage = () => {
         [pageIndex, pageSize]
     );
 
-    // Debounce search term
     const [debouncedSearch, setDebouncedSearch] = useState(globalFilter);
     useEffect(() => {
         const timer = setTimeout(() => setDebouncedSearch(globalFilter), 500);
         return () => clearTimeout(timer);
     }, [globalFilter]);
 
-    // Reset pagination when filter/search changes
     useEffect(() => {
         setPagination((prev) => ({ ...prev, pageIndex: 0 }));
     }, [debouncedSearch, roleFilter]);
 
-    // Fetch users when pagination, search, sorting or filters change
     useEffect(() => {
         const fetchUsers = async () => {
             dispatch(fetchUsersStart());
@@ -94,28 +86,28 @@ const DevelopersPage = () => {
                 header: 'Name',
                 accessorKey: 'name',
                 cell: (info) => (
-                    <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#00c6ff] to-[#0072ff] flex items-center justify-center text-white font-bold text-xs">
+                    <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-black text-sm shadow-md">
                             {info.getValue()?.charAt(0).toUpperCase() || '?'}
                         </div>
-                        <span className="font-medium text-gray-900 dark:text-gray-200">{info.getValue()}</span>
+                        <span className="font-bold text-slate-800 dark:text-slate-100">{info.getValue()}</span>
                     </div>
                 ),
             },
             {
                 header: 'Email',
                 accessorKey: 'email',
-                cell: (info) => <span className="text-gray-400">{info.getValue()}</span>,
+                cell: (info) => <span className="text-slate-500 dark:text-slate-400 font-medium">{info.getValue()}</span>,
             },
             {
                 header: 'Role',
                 accessorKey: 'role',
                 cell: (info) => (
-                    <span className={`px-2 py-1 rounded-md text-xs font-medium ${info.getValue() === USER_ROLES.MANAGER
-                            ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
-                            : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+                    <span className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border ${info.getValue() === USER_ROLES.MANAGER
+                        ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-purple-100 dark:border-purple-500/20'
+                        : 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-500/20'
                         }`}>
-                        {info.getValue().toUpperCase()}
+                        {info.getValue()}
                     </span>
                 ),
             },
@@ -127,9 +119,9 @@ const DevelopersPage = () => {
                         <button
                             onClick={isManagerUser ? () => handleEditClick(info.row.original) : undefined}
                             disabled={!isManagerUser}
-                            className={`p-1.5 rounded-md transition-colors ${isManagerUser
-                                    ? 'text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer'
-                                    : 'text-gray-400 cursor-not-allowed'
+                            className={`p-2 rounded-xl transition-all ${isManagerUser
+                                ? 'text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer'
+                                : 'text-slate-300 dark:text-slate-700 cursor-not-allowed'
                                 }`}
                             title={isManagerUser ? "Edit" : "Only managers can edit developers"}
                         >
@@ -161,123 +153,137 @@ const DevelopersPage = () => {
     });
 
     return (
-        <div className="p-6 max-h-screen overflow-hidden flex flex-col h-full">
-            {/* Header */}
-            <div className="flex justify-between items-center mb-8">
+        <div className="h-full flex flex-col p-8 space-y-6 bg-transparent overflow-hidden">
+            {/* Page Header - Fixed */}
+            <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 flex-shrink-0"
+            >
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Developers</h1>
-                    <p className="text-gray-500 dark:text-gray-400">Manage your team members and permissions</p>
+                    <h1 className="text-4xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">
+                        Engineer Registry
+                    </h1>
+                    <p className="text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px] tracking-[0.2em]">Personnel Management & Permissions</p>
                 </div>
                 <motion.button
-                    whileHover={isManagerUser ? { scale: 1.05 } : {}}
-                    whileTap={isManagerUser ? { scale: 0.95 } : {}}
+                    whileHover={isManagerUser ? { scale: 1.02 } : {}}
+                    whileTap={isManagerUser ? { scale: 0.98 } : {}}
                     onClick={() => setIsDrawerOpen(true)}
                     disabled={!isManagerUser}
-                    className={`flex items-center gap-2 px-5 py-2.5 rounded-lg shadow-lg transition-all font-medium ${isManagerUser
-                            ? 'bg-[#007bff] hover:bg-[#0069d9] text-white shadow-blue-500/20 cursor-pointer'
-                            : 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-50'
+                    className={`flex items-center gap-2 px-8 py-3.5 rounded-2xl shadow-lg transition-all font-black text-xs uppercase tracking-widest min-w-[200px] justify-center ${isManagerUser
+                        ? 'bg-blue-600 hover:bg-blue-700 text-white cursor-pointer'
+                        : 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed opacity-50'
                         }`}
-                    title={isManagerUser ? "Add new developer" : "Only managers can add developers"}
                 >
-                    <IoAdd size={20} />
+                    <IoAdd size={24} />
                     Add Developer
                 </motion.button>
-            </div>
+            </motion.div>
 
-            {/* Search, Filter & Actions Bar */}
-            <div className="mb-6 flex flex-col sm:flex-row gap-4">
-                <div className="relative max-w-md flex-1">
-                    <IoSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            {/* Filter Section - Fixed */}
+            <div className="flex flex-col sm:flex-row gap-6 flex-shrink-0">
+                <div className="glass-card relative max-w-md flex-1 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <IoSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input
                         value={globalFilter ?? ''}
                         onChange={(e) => setGlobalFilter(e.target.value)}
-                        placeholder="Search developers..."
-                        className="w-full bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 rounded-lg pl-10 pr-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-gray-700 dark:text-gray-200 transition-all shadow-sm"
+                        placeholder="Search personnel..."
+                        className="w-full bg-transparent border-none rounded-2xl pl-12 pr-4 py-4 outline-none text-slate-800 dark:text-slate-100 transition-all font-bold"
                     />
                 </div>
 
-                {/* Role Filter Dropdown */}
-                <select
-                    value={roleFilter}
-                    onChange={(e) => setRoleFilter(e.target.value)}
-                    className="bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500/50 shadow-sm cursor-pointer"
-                >
-                    <option value="">All Roles</option>
-                    <option value={USER_ROLES.DEVELOPER}>Developers</option>
-                    <option value={USER_ROLES.MANAGER}>Managers</option>
-                </select>
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-6 flex items-center shadow-sm">
+                    <select
+                        value={roleFilter}
+                        onChange={(e) => setRoleFilter(e.target.value)}
+                        className="bg-transparent border-none text-slate-600 dark:text-slate-300 py-4 outline-none font-black text-[10px] uppercase tracking-widest cursor-pointer"
+                    >
+                        <option value="" className="dark:bg-slate-900">All Status Codes</option>
+                        <option value={USER_ROLES.DEVELOPER} className="dark:bg-slate-900">Developers</option>
+                        <option value={USER_ROLES.MANAGER} className="dark:bg-slate-900">Managers</option>
+                    </select>
+                </div>
             </div>
 
-            {/* Table Container */}
-            <div className="flex-1 overflow-auto bg-white dark:bg-[#1e1e1e] rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
-                <table className="w-full text-left border-collapse">
-                    <thead className="bg-gray-50 dark:bg-[#252526] sticky top-0 z-10">
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <tr key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => (
-                                    <th
-                                        key={header.id}
-                                        onClick={header.column.getToggleSortingHandler()}
-                                        className="p-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800 cursor-pointer hover:bg-white/5 transition-colors select-none"
-                                    >
-                                        <div className="flex items-center gap-2">
-                                            {flexRender(header.column.columnDef.header, header.getContext())}
-                                            {{
-                                                asc: <span className="text-[#00c6ff]">▲</span>,
-                                                desc: <span className="text-[#00c6ff]">▼</span>,
-                                            }[header.column.getIsSorted()] ?? null}
-                                        </div>
-                                    </th>
-                                ))}
-                            </tr>
-                        ))}
-                    </thead>
-                    <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                        {isLoading ? (
-                            <tr>
-                                <td colSpan={columns.length} className="p-8 text-center text-gray-500">
-                                    Loading team members...
-                                </td>
-                            </tr>
-                        ) : table.getRowModel().rows.length === 0 ? (
-                            <tr>
-                                <td colSpan={columns.length} className="p-8 text-center text-gray-500">
-                                    No developers found.
-                                </td>
-                            </tr>
-                        ) : (
-                            table.getRowModel().rows.map((row) => (
-                                <tr key={row.id} className="hover:bg-gray-50 dark:hover:bg-[#2a2d2e] transition-colors">
-                                    {row.getVisibleCells().map((cell) => (
-                                        <td key={cell.id} className="p-4 text-sm whitespace-nowrap">
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                        </td>
+            {/* Table Area - Scrollable */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="glass-card rounded-[32px] overflow-hidden flex-1 min-h-0 flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm"
+            >
+                <div className="overflow-auto scrollbar-hide flex-1">
+                    <table className="w-full text-left border-collapse min-w-[1000px]">
+                        <thead className="bg-slate-50 dark:bg-slate-800/50 sticky top-0 z-10 border-b border-slate-200 dark:border-slate-800">
+                            {table.getHeaderGroups().map((headerGroup) => (
+                                <tr key={headerGroup.id}>
+                                    {headerGroup.headers.map((header) => (
+                                        <th
+                                            key={header.id}
+                                            onClick={header.column.getToggleSortingHandler()}
+                                            className="p-6 text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none"
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                {flexRender(header.column.columnDef.header, header.getContext())}
+                                                {{
+                                                    asc: <span className="text-blue-500">▲</span>,
+                                                    desc: <span className="text-blue-500">▼</span>,
+                                                }[header.column.getIsSorted()] ?? null}
+                                            </div>
+                                        </th>
                                     ))}
                                 </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
-            </div>
+                            ))}
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                            {isLoading ? (
+                                <tr>
+                                    <td colSpan={columns.length} className="p-16 text-center">
+                                        <div className="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+                                        <p className="text-slate-400 mt-4 font-black uppercase text-[10px] tracking-widest">Scanning Force...</p>
+                                    </td>
+                                </tr>
+                            ) : table.getRowModel().rows.length === 0 ? (
+                                <tr>
+                                    <td colSpan={columns.length} className="p-16 text-center text-slate-400 font-bold uppercase text-xs tracking-widest italic opacity-50">
+                                        No personnel detected in sector.
+                                    </td>
+                                </tr>
+                            ) : (
+                                table.getRowModel().rows.map((row) => (
+                                    <tr key={row.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+                                        {row.getVisibleCells().map((cell) => (
+                                            <td key={cell.id} className="p-6 text-sm font-medium whitespace-nowrap">
+                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </motion.div>
 
-            {/* Simple Pagination */}
-            <div className="flex items-center justify-end gap-2 mt-4">
+            {/* Pagination Hub - Fixed At Bottom */}
+            <div className="flex items-center justify-end gap-3 flex-shrink-0">
                 <button
-                    className="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded disabled:opacity-50"
+                    className="p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl disabled:opacity-20 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm"
                     onClick={() => table.previousPage()}
                     disabled={!table.getCanPreviousPage()}
                 >
-                    {'<'}
+                    <IoChevronDown size={20} className="rotate-90 text-slate-500" />
                 </button>
-                <span className="text-sm text-gray-500">
-                    Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
-                </span>
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-6 py-3 rounded-2xl text-[10px] font-black text-slate-500 tracking-widest uppercase shadow-sm">
+                    Personnel Index <span className="text-blue-600 dark:text-blue-500 mx-1">{table.getState().pagination.pageIndex + 1}</span> / {table.getPageCount() || 1}
+                </div>
                 <button
-                    className="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded disabled:opacity-50"
+                    className="p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl disabled:opacity-20 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm"
                     onClick={() => table.nextPage()}
                     disabled={!table.getCanNextPage()}
                 >
-                    {'>'}
+                    <IoChevronDown size={20} className="-rotate-90 text-slate-500" />
                 </button>
             </div>
 

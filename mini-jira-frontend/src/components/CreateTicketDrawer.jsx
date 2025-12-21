@@ -1,6 +1,7 @@
 import { Fragment, useState, useEffect } from 'react';
 import { Dialog, Transition, Listbox } from '@headlessui/react';
-import { IoClose, IoCheckmark, IoChevronDown } from "react-icons/io5";
+import { IoClose, IoCheckmark, IoChevronDown, IoSparkles } from "react-icons/io5";
+import { motion } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     createTicketStart, createTicketSuccess, createTicketFailure,
@@ -9,8 +10,11 @@ import {
 import ticketService from '../services/ticketService';
 import projectService from '../services/projectService';
 import userService from '../services/userService';
+import suggestionService from '../services/suggestionService';
+import api from '../api/axios';
+import LoadingButton from './LoadingButton';
+import SmartSuggestions from './SmartSuggestions';
 
-// Options
 const TICKET_PRIORITY = {
     LOW: 'Low',
     MEDIUM: 'Medium',
@@ -25,29 +29,30 @@ const TICKET_STATUS = {
     CLOSED: 'Closed',
 };
 
+const initialState = {
+    projectId: '',
+    title: '',
+    description: '',
+    assignees: [],
+    status: TICKET_STATUS.OPEN,
+    priority: TICKET_PRIORITY.MEDIUM,
+    spendTime: 0,
+    duration: 0,
+    remark: '',
+};
+
 export default function CreateTicketDrawer({ open, onClose, ticketToEdit }) {
     const dispatch = useDispatch();
     const { isLoading, isError, message } = useSelector((state) => state.tickets);
     const isEditMode = !!ticketToEdit;
 
-    // Dropdown Data
     const [projectOptions, setProjectOptions] = useState([]);
     const [userOptions, setUserOptions] = useState([]);
+    const [formData, setFormData] = useState(initialState);
+    const [isRefining, setIsRefining] = useState(false);
+    const [suggestions, setSuggestions] = useState(null);
+    const [analyzing, setAnalyzing] = useState(false);
 
-    // Form State
-    const [formData, setFormData] = useState({
-        projectId: '',
-        title: '',
-        description: '',
-        assignees: [], // Array of User IDs
-        status: TICKET_STATUS.OPEN,
-        priority: TICKET_PRIORITY.MEDIUM,
-        spendTime: 0,
-        duration: 0,
-        remark: '',
-    });
-
-    // Reset loop
     useEffect(() => {
         if (open) {
             if (ticketToEdit) {
@@ -63,31 +68,17 @@ export default function CreateTicketDrawer({ open, onClose, ticketToEdit }) {
                     remark: ticketToEdit.remark || '',
                 });
             } else {
-                setFormData({
-                    projectId: '',
-                    title: '',
-                    description: '',
-                    assignees: [],
-                    status: TICKET_STATUS.OPEN,
-                    priority: TICKET_PRIORITY.MEDIUM,
-                    spendTime: 0,
-                    duration: 0,
-                    remark: '',
-                });
+                setFormData(initialState);
             }
         }
     }, [open, ticketToEdit]);
 
-    // Fetch Options
     useEffect(() => {
         if (open) {
             const fetchData = async () => {
                 try {
-                    // Fetch Projects (limit 100 for dropdown)
                     const projData = await projectService.getProjects({ limit: 100 });
                     setProjectOptions(projData.projects || []);
-
-                    // Fetch Developers (limit 100) - Assuming tickets assigned to devs
                     const userData = await userService.getUsers({ limit: 100 });
                     setUserOptions(userData.users || []);
                 } catch (err) {
@@ -98,14 +89,59 @@ export default function CreateTicketDrawer({ open, onClose, ticketToEdit }) {
         }
     }, [open]);
 
+    useEffect(() => {
+        const timer = setTimeout(async () => {
+            if (formData.title.length > 5 && !isEditMode) {
+                setAnalyzing(true);
+                try {
+                    const result = await suggestionService.analyzeTicket({
+                        title: formData.title,
+                        description: formData.description,
+                        projectId: formData.projectId
+                    });
+                    setSuggestions(result);
+                } catch (error) {
+                    console.error("Analysis failed", error);
+                } finally {
+                    setAnalyzing(false);
+                }
+            }
+        }, 1000);
+        return () => clearTimeout(timer);
+    }, [formData.title, formData.projectId]);
+
+    const handleApplyAssignee = (userId) => {
+        if (!formData.assignees.includes(userId)) {
+            setFormData(prev => ({ ...prev, assignees: [...prev.assignees, userId] }));
+        }
+    };
+
+    const handleApplyPriority = (priority) => {
+        setFormData(prev => ({ ...prev, priority }));
+    };
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleRefineDescription = async () => {
+        if (!formData.description.trim() || isRefining) return;
+        setIsRefining(true);
+        try {
+            const response = await api.post('/ai/refine-description', {
+                description: formData.description
+            });
+            setFormData(prev => ({ ...prev, description: response.data.refinedDescription }));
+        } catch (error) {
+            console.error("Refinement error:", error);
+        } finally {
+            setIsRefining(false);
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         if (isEditMode) {
             dispatch(updateTicketStart());
         } else {
@@ -134,7 +170,18 @@ export default function CreateTicketDrawer({ open, onClose, ticketToEdit }) {
     return (
         <Transition.Root show={open} as={Fragment}>
             <Dialog as="div" className="relative z-50" onClose={onClose}>
-                <div className="fixed inset-0 bg-black/30 backdrop-blur-sm transition-opacity" />
+                {/* Backdrop - Solid Dim */}
+                <Transition.Child
+                    as={Fragment}
+                    enter="ease-out duration-300"
+                    enterFrom="opacity-0"
+                    enterTo="opacity-100"
+                    leave="ease-in duration-200"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                >
+                    <div className="fixed inset-0 bg-slate-900/60 transition-opacity" />
+                </Transition.Child>
 
                 <div className="fixed inset-0 overflow-hidden">
                     <div className="absolute inset-0 overflow-hidden">
@@ -148,49 +195,49 @@ export default function CreateTicketDrawer({ open, onClose, ticketToEdit }) {
                                 leaveFrom="translate-x-0"
                                 leaveTo="translate-x-full"
                             >
-                                <Dialog.Panel className="pointer-events-auto w-screen max-w-md">
-                                    <div className="flex h-full flex-col overflow-y-scroll bg-white dark:bg-[#1e1e1e] shadow-xl">
-                                        <div className="px-6 py-6 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
-                                            <Dialog.Title className="text-xl font-semibold text-gray-900 dark:text-white">
-                                                {isEditMode ? 'Edit Ticket' : 'New Ticket'}
-                                            </Dialog.Title>
-                                            <button
-                                                onClick={onClose}
-                                                className="text-gray-400 hover:text-gray-500 focus:outline-none"
-                                            >
+                                <Dialog.Panel className="pointer-events-auto w-screen max-w-lg">
+                                    <div className="flex h-full flex-col bg-white dark:bg-slate-950 shadow-2xl overflow-hidden border-l border-slate-200 dark:border-slate-800">
+                                        <div className="px-8 py-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900/50">
+                                            <div>
+                                                <Dialog.Title className="text-2xl font-black text-slate-900 dark:text-white leading-tight">
+                                                    {isEditMode ? 'Edit Neural Node' : 'Draft New Ticket'}
+                                                </Dialog.Title>
+                                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Classification and assignment</p>
+                                            </div>
+                                            <button onClick={onClose} className="p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-400 hover:text-rose-500 transition-all">
                                                 <IoClose size={24} />
                                             </button>
                                         </div>
 
-                                        <div className="relative flex-1 px-6 py-6">
+                                        <div className="relative flex-1 px-8 py-8 overflow-y-auto scrollbar-hide">
                                             {isError && (
-                                                <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm">
+                                                <div className="mb-4 p-3 bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 rounded-lg text-red-600 dark:text-red-500 text-sm font-bold">
                                                     {message}
                                                 </div>
                                             )}
 
-                                            <form onSubmit={handleSubmit} className="space-y-5">
-                                                <div>
-                                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                                        Project
+                                            <form onSubmit={handleSubmit} className="space-y-6">
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
+                                                        Architecture Hub
                                                     </label>
                                                     <select
                                                         name="projectId"
                                                         required
                                                         value={formData.projectId}
                                                         onChange={handleChange}
-                                                        className="w-full bg-gray-50 dark:bg-[#252526] border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white"
+                                                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold appearance-none transition-all"
                                                     >
-                                                        <option value="">Select a Project</option>
+                                                        <option value="" className="dark:bg-slate-900">Select Project Hub...</option>
                                                         {projectOptions.map((p) => (
-                                                            <option key={p._id} value={p._id}>{p.name}</option>
+                                                            <option key={p._id} value={p._id} className="dark:bg-slate-900">{p.name}</option>
                                                         ))}
                                                     </select>
                                                 </div>
 
-                                                <div>
-                                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                                        Title
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
+                                                        Ticket Blueprint
                                                     </label>
                                                     <input
                                                         type="text"
@@ -198,65 +245,71 @@ export default function CreateTicketDrawer({ open, onClose, ticketToEdit }) {
                                                         required
                                                         value={formData.title}
                                                         onChange={handleChange}
-                                                        className="w-full bg-gray-50 dark:bg-[#252526] border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white"
-                                                        placeholder="Ticket summary..."
+                                                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold placeholder:text-slate-400 transition-all"
+                                                        placeholder="What needs to be built?"
+                                                    />
+                                                    <SmartSuggestions
+                                                        loading={analyzing}
+                                                        suggestions={suggestions}
+                                                        onApplyAssignee={handleApplyAssignee}
+                                                        onApplyPriority={handleApplyPriority}
                                                     />
                                                 </div>
 
                                                 <div className="grid grid-cols-2 gap-4">
-                                                    <div>
-                                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                                            Status
+                                                    <div className="space-y-2">
+                                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
+                                                            Workflow Status
                                                         </label>
                                                         <select
                                                             name="status"
                                                             value={formData.status}
                                                             onChange={handleChange}
-                                                            className="w-full bg-gray-50 dark:bg-[#252526] border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white"
+                                                            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold appearance-none transition-all"
                                                         >
                                                             {Object.values(TICKET_STATUS).map((s) => (
-                                                                <option key={s} value={s}>{s}</option>
+                                                                <option key={s} value={s} className="dark:bg-slate-900">{s}</option>
                                                             ))}
                                                         </select>
                                                     </div>
-                                                    <div>
-                                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                                            Priority
+                                                    <div className="space-y-2">
+                                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
+                                                            Priority Level
                                                         </label>
                                                         <select
                                                             name="priority"
                                                             value={formData.priority}
                                                             onChange={handleChange}
-                                                            className="w-full bg-gray-50 dark:bg-[#252526] border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white"
+                                                            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold appearance-none transition-all"
                                                         >
                                                             {Object.values(TICKET_PRIORITY).map((p) => (
-                                                                <option key={p} value={p}>{p}</option>
+                                                                <option key={p} value={p} className="dark:bg-slate-900">{p}</option>
                                                             ))}
                                                         </select>
                                                     </div>
                                                 </div>
 
-                                                <div className="relative">
-                                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                                        Assign To
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
+                                                        Assigned Neural Nodes
                                                     </label>
                                                     <Listbox
                                                         value={formData.assignees}
                                                         onChange={(selectedUsers) => setFormData({ ...formData, assignees: selectedUsers })}
                                                         multiple
                                                     >
-                                                        <div className="relative mt-1">
-                                                            <Listbox.Button className="relative w-full cursor-default rounded-lg bg-gray-50 dark:bg-[#252526] py-2.5 pl-4 pr-10 text-left border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500/50 sm:text-sm text-gray-900 dark:text-white min-h-[42px]">
+                                                        <div className="relative">
+                                                            <Listbox.Button className="relative w-full cursor-default rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 py-3.5 pl-5 pr-12 text-left outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold min-h-[50px] transition-all">
                                                                 <span className="block truncate">
                                                                     {formData.assignees.length === 0
-                                                                        ? 'Select Developers'
+                                                                        ? 'Connect Developers...'
                                                                         : userOptions
                                                                             .filter((u) => formData.assignees.includes(u._id))
                                                                             .map((u) => u.name)
                                                                             .join(', ')}
                                                                 </span>
-                                                                <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                                                                    <IoChevronDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                                                <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4">
+                                                                    <IoChevronDown className="h-5 w-5 text-slate-400" aria-hidden="true" />
                                                                 </span>
                                                             </Listbox.Button>
                                                             <Transition
@@ -265,23 +318,23 @@ export default function CreateTicketDrawer({ open, onClose, ticketToEdit }) {
                                                                 leaveFrom="opacity-100"
                                                                 leaveTo="opacity-0"
                                                             >
-                                                                <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-[#1e1e1e] py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm z-50">
+                                                                <Listbox.Options className="absolute mt-2 max-h-60 w-full overflow-auto rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 py-2 text-base shadow-2xl ring-1 ring-black/5 outline-none sm:text-sm z-50">
                                                                     {userOptions.map((user) => (
                                                                         <Listbox.Option
                                                                             key={user._id}
                                                                             className={({ active }) =>
-                                                                                `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-900 dark:text-blue-100' : 'text-gray-900 dark:text-gray-100'
+                                                                                `relative cursor-default select-none py-3 pl-12 pr-4 transition-colors ${active ? 'bg-blue-600 text-white' : 'text-slate-800 dark:text-slate-100'
                                                                                 }`
                                                                             }
                                                                             value={user._id}
                                                                         >
                                                                             {({ selected }) => (
                                                                                 <>
-                                                                                    <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
+                                                                                    <span className={`block truncate ${selected ? 'font-black' : 'font-medium'}`}>
                                                                                         {user.name}
                                                                                     </span>
                                                                                     {selected ? (
-                                                                                        <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-600 dark:text-blue-400">
+                                                                                        <span className={`absolute inset-y-0 left-0 flex items-center pl-4 ${selected ? 'text-white' : 'text-blue-600'}`}>
                                                                                             <IoCheckmark className="h-5 w-5" aria-hidden="true" />
                                                                                         </span>
                                                                                     ) : null}
@@ -295,76 +348,97 @@ export default function CreateTicketDrawer({ open, onClose, ticketToEdit }) {
                                                     </Listbox>
                                                 </div>
 
-                                                <div>
-                                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                                        Description
-                                                    </label>
+                                                <div className="space-y-2">
+                                                    <div className="flex justify-between items-center ml-1">
+                                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                                                            Operation Details
+                                                        </label>
+                                                        <motion.button
+                                                            type="button"
+                                                            whileHover={{ scale: 1.05 }}
+                                                            whileTap={{ scale: 0.95 }}
+                                                            onClick={handleRefineDescription}
+                                                            disabled={!formData.description.trim() || isRefining}
+                                                            className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-tighter transition-all ${isRefining
+                                                                ? 'bg-blue-600 text-white animate-pulse'
+                                                                : 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-500/20'
+                                                                } disabled:opacity-30 disabled:cursor-not-allowed`}
+                                                        >
+                                                            {isRefining ? 'Re-coding...' : (
+                                                                <>
+                                                                    <IoSparkles className="text-sm" />
+                                                                    Refine with AI
+                                                                </>
+                                                            )}
+                                                        </motion.button>
+                                                    </div>
                                                     <textarea
                                                         name="description"
                                                         value={formData.description}
                                                         onChange={handleChange}
-                                                        rows={3}
-                                                        className="w-full bg-gray-50 dark:bg-[#252526] border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white resize-none"
-                                                        placeholder="Details..."
+                                                        rows={5}
+                                                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold resize-none placeholder:text-slate-400 transition-all"
+                                                        placeholder="Technical description of the requirement..."
                                                     />
                                                 </div>
 
                                                 <div className="grid grid-cols-2 gap-4">
-                                                    <div>
-                                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                                            Spend Time (hrs)
+                                                    <div className="space-y-2">
+                                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
+                                                            Neural Hours
                                                         </label>
                                                         <input
                                                             type="number"
                                                             name="spendTime"
                                                             value={formData.spendTime}
                                                             onChange={handleChange}
-                                                            className="w-full bg-gray-50 dark:bg-[#252526] border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white"
+                                                            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold appearance-none transition-all"
                                                         />
                                                     </div>
-                                                    <div>
-                                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                                            Duration (days)
+                                                    <div className="space-y-2">
+                                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
+                                                            Cycle Duration
                                                         </label>
                                                         <input
                                                             type="number"
                                                             name="duration"
                                                             value={formData.duration}
                                                             onChange={handleChange}
-                                                            className="w-full bg-gray-50 dark:bg-[#252526] border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white"
+                                                            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold appearance-none transition-all"
                                                         />
                                                     </div>
                                                 </div>
 
-                                                <div>
-                                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                                        Remark
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
+                                                        Technical Remark
                                                     </label>
                                                     <input
                                                         type="text"
                                                         name="remark"
                                                         value={formData.remark}
                                                         onChange={handleChange}
-                                                        className="w-full bg-gray-50 dark:bg-[#252526] border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white"
-                                                        placeholder="Any remarks..."
+                                                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold placeholder:text-slate-400 transition-all"
+                                                        placeholder="Internal system notes..."
                                                     />
                                                 </div>
 
-                                                <div className="pt-4 flex gap-3">
+                                                <div className="pt-6 flex gap-4">
                                                     <button
                                                         type="button"
                                                         onClick={onClose}
-                                                        className="flex-1 px-4 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-[#252526] transition-colors font-medium"
+                                                        className="flex-1 px-6 py-4 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-800 transition-all font-black text-[10px] uppercase tracking-widest"
                                                     >
-                                                        Cancel
+                                                        Abort
                                                     </button>
-                                                    <button
+                                                    <LoadingButton
                                                         type="submit"
-                                                        disabled={isLoading}
-                                                        className="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-lg shadow-blue-500/20 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                                                        isLoading={isLoading}
+                                                        loadingText={isEditMode ? 'Syncing...' : 'Deploying...'}
+                                                        className="flex-1 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl shadow-lg shadow-blue-500/10 font-black text-[10px] uppercase tracking-widest transition-all"
                                                     >
-                                                        {isLoading ? (isEditMode ? 'Updating...' : 'Creating...') : (isEditMode ? 'Update Ticket' : 'Create Ticket')}
-                                                    </button>
+                                                        {isEditMode ? 'Update Neural Node' : 'Initialize Ticket'}
+                                                    </LoadingButton>
                                                 </div>
                                             </form>
                                         </div>
