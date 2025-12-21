@@ -39,7 +39,7 @@ const KanbanColumn = ({ id, title, tickets, count, onAddTicket, onTicketClick })
             {/* Droppable Area - Pure Solid Card */}
             <div
                 ref={setNodeRef}
-                className="flex-1 bg-slate-50/50 dark:bg-slate-900/50 rounded-[2.5rem] p-4 border border-slate-200 dark:border-slate-800 shadow-inner overflow-y-auto scrollbar-hide min-h-[500px]"
+                className="flex-1 bg-slate-50 dark:bg-slate-900/40 rounded-[2.5rem] p-4 border border-slate-100 dark:border-slate-800 shadow-inner overflow-y-auto scrollbar-hide min-h-[500px]"
             >
                 <SortableContext items={tickets.map(t => t._id)} strategy={verticalListSortingStrategy}>
                     <div className="space-y-4 min-h-[400px]">
@@ -54,8 +54,8 @@ const KanbanColumn = ({ id, title, tickets, count, onAddTicket, onTicketClick })
                 </SortableContext>
 
                 {tickets.length === 0 && (
-                    <div className="h-60 flex flex-col items-center justify-center text-slate-400 dark:text-slate-600 text-sm border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2rem] m-2 transition-all group-hover:border-blue-500/30">
-                        <div className="text-[10px] font-black tracking-[0.3em] uppercase opacity-30">Neural Drop Zone</div>
+                    <div className="h-60 flex flex-col items-center justify-center text-slate-400 dark:text-slate-600 text-sm border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-[2rem] m-2 transition-all group-hover:border-blue-500/30">
+                        <div className="text-[10px] font-black tracking-[0.3em] uppercase opacity-30">Drop Zone</div>
                     </div>
                 )}
             </div>

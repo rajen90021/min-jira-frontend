@@ -378,7 +378,7 @@ const TicketsPage = () => {
                     </div>
                     <div className="w-48">
                         <FilterDropdown
-                            title="Node Priority"
+                            title="Priority"
                             value={priorityFilter}
                             options={PRIORITY_OPTIONS}
                             onChange={setPriorityFilter}
@@ -401,12 +401,12 @@ const TicketsPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="glass-card rounded-3xl border border-white/5 shadow-2xl overflow-hidden flex-1 min-h-0 flex flex-col"
+                className="glass-card rounded-[32px] overflow-hidden flex-1 min-h-0 flex flex-col shadow-sm"
             >
                 <div className="overflow-auto scrollbar-hide flex-1">
                     <table className="w-full text-left min-w-[1000px]">
                         <thead className="sticky top-0 z-10">
-                            <tr className="border-b border-white/5 bg-slate-50 dark:bg-slate-800/80 backdrop-blur-md">
+                            <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900">
                                 {table.getHeaderGroups()[0].headers.map((header) => (
                                     <th key={header.id} className="p-6 text-[10px] font-black text-gray-500 uppercase tracking-widest">
                                         {flexRender(header.column.columnDef.header, header.getContext())}
@@ -414,7 +414,7 @@ const TicketsPage = () => {
                                 ))}
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5">
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                             {isLoading ? (
                                 <tr>
                                     <td colSpan={columns.length} className="p-4">
@@ -467,7 +467,7 @@ const TicketsPage = () => {
                 >
                     <IoChevronDown size={20} className="rotate-90 text-slate-500" />
                 </button>
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-6 py-3 rounded-2xl text-[10px] font-black text-slate-500 tracking-widest uppercase shadow-sm">
+                <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 px-6 py-3 rounded-2xl text-[10px] font-black text-slate-500 tracking-widest uppercase shadow-sm">
                     Registry <span className="text-blue-600 dark:text-blue-500 mx-1">{table.getState().pagination.pageIndex + 1}</span> / {table.getPageCount() || 1}
                 </div>
                 <button

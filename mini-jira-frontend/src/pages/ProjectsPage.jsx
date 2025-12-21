@@ -209,7 +209,7 @@ const ProjectsPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="glass-card rounded-[32px] overflow-hidden flex-1 min-h-0 flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm"
+                className="glass-card rounded-[32px] overflow-hidden flex-1 min-h-0 flex flex-col shadow-sm"
             >
                 <div className="overflow-auto scrollbar-hide flex-1">
                     <table className="w-full text-left border-collapse min-w-[1000px]">
@@ -273,7 +273,7 @@ const ProjectsPage = () => {
                 >
                     <IoChevronDown size={20} className="rotate-90 text-slate-500" />
                 </button>
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-6 py-3 rounded-2xl text-[10px] font-black text-slate-500 tracking-widest uppercase shadow-sm">
+                <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 px-6 py-3 rounded-2xl text-[10px] font-black text-slate-500 tracking-widest uppercase shadow-sm">
                     Registry <span className="text-blue-600 dark:text-blue-500 mx-1">{table.getState().pagination.pageIndex + 1}</span> / {table.getPageCount() || 1}
                 </div>
                 <button

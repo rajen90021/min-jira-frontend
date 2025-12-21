@@ -6,14 +6,14 @@
   --color-primary: #3b82f6;
   --color-secondary: #64748b;
 
-  /* Solid Theme Colors */
+  /* Professional Theme Colors */
   --color-pane-bg: #ffffff;
-  --color-pane-bg-dark: #0f172a;
-  --color-pane-border: #e2e8f0;
-  --color-pane-border-dark: #1e293b;
+  --color-pane-bg-dark: #1e293b;
+  --color-pane-border: #f1f5f9;
+  --color-pane-border-dark: #334155;
 
-  --shadow-premium: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
-  --shadow-premium-dark: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
+  --shadow-premium: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-premium-dark: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
 @layer base {
@@ -26,11 +26,11 @@
   }
 
   body {
-    @apply bg-slate-50 text-gray-900 transition-colors duration-500;
+    @apply bg-white text-slate-900 transition-colors duration-500;
   }
 
   .dark body {
-    @apply bg-[#030712] text-white;
+    @apply bg-slate-950 text-slate-100;
   }
 }
 
@@ -38,29 +38,29 @@
 
   /* Solid Card System */
   .glass-card {
-    @apply bg-[var(--color-pane-bg)] border border-[var(--color-pane-border)] shadow-sm;
+    @apply bg-white border border-slate-100 shadow-sm transition-all duration-300;
   }
 
   .dark .glass-card {
-    @apply bg-[var(--color-pane-bg-dark)] border-[var(--color-pane-border-dark)] shadow-md;
+    @apply bg-slate-900 border-slate-800 shadow-md;
   }
 
   /* Solid Sidebar System */
   .glass-sidebar {
-    @apply bg-white border-r border-slate-200;
+    @apply bg-white border-r border-slate-100 shadow-sm;
   }
 
   .dark .glass-sidebar {
-    @apply bg-[#020617] border-r border-slate-800;
+    @apply bg-slate-950 border-r border-slate-800;
   }
 
   /* Static Solid Backgrounds - No Gradients */
   .bg-mesh {
-    @apply relative overflow-hidden bg-slate-50 transition-colors duration-700;
+    @apply relative overflow-hidden bg-white transition-colors duration-700;
   }
 
   .dark .bg-mesh {
-    @apply bg-[#030712];
+    @apply bg-slate-950;
   }
 
   /* Premium Buttons - Solid */

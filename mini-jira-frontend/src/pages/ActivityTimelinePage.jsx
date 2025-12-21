@@ -114,7 +114,7 @@ const ActivityTimelinePage = () => {
                                         {getActionIcon(activity.action)}
                                     </div>
 
-                                    <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-[2.5rem] p-8 border border-slate-200 dark:border-slate-800 hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/5 transition-all group shadow-sm">
+                                    <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 hover:border-blue-500/50 hover:shadow-xl transition-all group shadow-sm">
                                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-5">
                                             <div className="flex items-center gap-4">
                                                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-700 flex items-center justify-center text-white font-black shadow-lg">
@@ -170,7 +170,7 @@ const ActivityTimelinePage = () => {
                     >
                         <IoChevronDown size={20} className="rotate-90 text-slate-500" />
                     </button>
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-6 py-3 rounded-2xl text-[10px] font-black text-slate-400 tracking-widest uppercase shadow-sm">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 px-6 py-3 rounded-2xl text-[10px] font-black text-slate-400 tracking-widest uppercase shadow-sm">
                         LOG PAGE <span className="text-blue-600">{page}</span> / {totalPages}
                     </div>
                     <button

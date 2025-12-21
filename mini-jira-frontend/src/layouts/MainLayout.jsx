@@ -164,10 +164,10 @@ export default function MiniDrawer() {
                         main: '#3b82f6',
                     },
                     background: {
-                        default: mode === 'light' ? '#f8fafc' : '#030712',
+                        default: mode === 'light' ? '#ffffff' : '#020617',
                         paper: mode === 'light' ? '#ffffff' : '#0f172a',
                     },
-                    divider: mode === 'light' ? '#e2e8f0' : '#1e293b',
+                    divider: mode === 'light' ? '#f1f5f9' : '#1e293b',
                 },
                 components: {
                     MuiPaper: {

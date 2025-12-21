@@ -11,18 +11,11 @@ import { format } from 'date-fns';
 import { Link, useNavigate } from 'react-router-dom';
 
 const MatrixBackground = () => (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.05] dark:opacity-[0.1]">
+    <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.03]">
         <div className="absolute inset-0" style={{
             backgroundImage: `radial-gradient(circle at 1.5px 1.5px, currentColor 1px, transparent 0)`,
-            backgroundSize: '32px 32px'
+            backgroundSize: '48px 48px'
         }} />
-        <motion.div
-            animate={{
-                y: ['-50%', '0%']
-            }}
-            transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
-            className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500/20 to-transparent w-full h-[200%]"
-        />
     </div>
 );
 
@@ -34,7 +27,7 @@ const StatCard = ({ title, value, icon: Icon, colorClass, trend, delay = 0, to }
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay, duration: 0.4 }}
             onClick={() => to && navigate(to)}
-            className="group relative p-8 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-3xl border border-slate-200 dark:border-slate-800 cursor-pointer hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/5 transition-all duration-300 overflow-hidden"
+            className="group relative p-8 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 cursor-pointer hover:border-blue-500/50 hover:shadow-xl transition-all duration-300 overflow-hidden"
         >
             <div className={`absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity`}>
                 <Icon size={80} />
@@ -112,7 +105,7 @@ const DashboardPage = () => {
     const recentTickets = tickets?.slice(0, 5) || [];
 
     return (
-        <div className="h-full relative flex flex-col p-8 bg-slate-50 dark:bg-[#030712] transition-colors duration-500 overflow-hidden">
+        <div className="h-full relative flex flex-col p-8 bg-white dark:bg-slate-950 transition-colors duration-500 overflow-hidden">
             <MatrixBackground />
 
             {/* Header Hub */}
@@ -193,7 +186,7 @@ const DashboardPage = () => {
                             <Link to="/app/timeline" className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] hover:opacity-70 transition-opacity">View All history</Link>
                         </div>
 
-                        <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl rounded-[32px] border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+                        <div className="bg-white dark:bg-slate-900 rounded-[32px] border border-slate-100 dark:border-slate-800 overflow-hidden shadow-sm">
                             <div className="divide-y divide-slate-100 dark:divide-slate-800">
                                 {ticketsLoading ? (
                                     <div className="p-10 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest animate-pulse">Syncing Data Store...</div>
@@ -232,7 +225,7 @@ const DashboardPage = () => {
 
                     {/* Sidebar Hub */}
                     <div className="space-y-6">
-                        <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl rounded-[32px] p-8 border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <div className="bg-white dark:bg-slate-900 rounded-[32px] p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
                             <h2 className="text-[10px] font-black text-slate-900 dark:text-white mb-6 uppercase tracking-[0.3em]">Sector Monitoring</h2>
                             <div className="space-y-4">
                                 {[
