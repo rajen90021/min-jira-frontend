@@ -138,8 +138,8 @@ const KanbanBoardPage = () => {
             // API Call
             try {
                 const updatedTicket = await ticketService.updateTicket(activeId, { status: destColumn });
-                // Update Redux to keep sync
-                // We verify the update was successful
+                // Update Redux to keep sync across the app
+                dispatch(updateTicketSuccess(updatedTicket));
             } catch (error) {
                 showToast('Failed to update ticket status', 'error');
                 // Revert logic would go here in a production app

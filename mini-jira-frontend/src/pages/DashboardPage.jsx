@@ -97,8 +97,9 @@ const DashboardPage = () => {
             const open = tickets.filter(t => t.status?.toLowerCase() === 'open').length;
             const inProgress = tickets.filter(t => t.status?.toLowerCase() === 'in progress').length;
             const resolved = tickets.filter(t => t.status?.toLowerCase() === 'resolved').length;
+            const closed = tickets.filter(t => t.status?.toLowerCase() === 'closed').length;
             const critical = tickets.filter(t => t.priority?.toLowerCase() === 'critical').length;
-            setStats({ total: tickets.length, open, inProgress, resolved, critical });
+            setStats({ total: tickets.length, open, inProgress, resolved, closed, critical });
         }
     }, [tickets]);
 

@@ -50,6 +50,10 @@ const KanbanCard = ({ ticket, onClick }) => {
                 </div>
             </div>
 
+            <div className="mb-4">
+                <StatusBadge status={ticket.status} />
+            </div>
+
             <h4 className="font-black text-slate-800 group-hover:text-blue-600 transition-colors text-sm line-clamp-2 leading-tight mb-4">
                 {ticket.title}
             </h4>
