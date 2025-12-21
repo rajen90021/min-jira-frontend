@@ -160,7 +160,7 @@ const ProjectsPage = () => {
     });
 
     return (
-        <div className="h-full flex flex-col p-2 md:p-8 space-y-2 md:space-y-6 bg-transparent overflow-hidden">
+        <div className="h-full flex flex-col p-2 md:p-8 space-y-2 md:space-y-6 bg-transparent overflow-hidden min-w-0">
             {/* Page Header - Fixed */}
             <motion.div
                 initial={{ opacity: 0, x: -20 }}
@@ -209,11 +209,10 @@ const ProjectsPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="glass-card rounded-[32px] overflow-hidden flex-1 min-h-0 flex flex-col shadow-sm"
+                className="glass-card rounded-[32px] overflow-hidden flex-1 min-h-0 min-w-0 flex flex-col shadow-sm"
             >
-                {/* Desktop Table View */}
-                <div className="hidden md:block overflow-x-auto overflow-y-auto flex-1">
-                    <table className="w-full text-left border-collapse min-w-[1000px]">
+                <div className="overflow-x-auto overflow-y-auto flex-1 min-w-0">
+                    <table className="w-full text-left border-separate border-spacing-0 min-w-[1000px]">
                         <thead className="bg-slate-50 sticky top-0 z-10 border-b border-slate-200">
                             {table.getHeaderGroups().map((headerGroup) => (
                                 <tr key={headerGroup.id}>
@@ -221,7 +220,7 @@ const ProjectsPage = () => {
                                         <th
                                             key={header.id}
                                             onClick={header.column.getToggleSortingHandler()}
-                                            className="p-4 md:p-6 text-[10px] font-black text-slate-500 uppercase tracking-widest cursor-pointer hover:bg-slate-100 transition-colors select-none"
+                                            className="p-4 md:p-6 text-[10px] font-black text-slate-500 uppercase tracking-widest cursor-pointer hover:bg-slate-100 transition-colors select-none whitespace-nowrap"
                                         >
                                             <div className="flex items-center gap-2">
                                                 {flexRender(header.column.columnDef.header, header.getContext())}
@@ -262,60 +261,6 @@ const ProjectsPage = () => {
                             )}
                         </tbody>
                     </table>
-                </div>
-
-                {/* Mobile Card View */}
-                <div className="md:hidden flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 min-h-[60vh]">
-                    {isLoading ? (
-                        <div className="space-y-4">
-                            {[1, 2, 3].map(i => (
-                                <div key={i} className="bg-white p-6 rounded-3xl border border-slate-100 animate-pulse">
-                                    <div className="h-4 w-1/2 bg-slate-100 rounded-full mb-3" />
-                                    <div className="h-3 w-1/4 bg-slate-50 rounded-full" />
-                                </div>
-                            ))}
-                        </div>
-                    ) : table.getRowModel().rows.length === 0 ? (
-                        <div className="p-8 text-center text-slate-400 font-black uppercase text-[10px] tracking-widest opacity-50">
-                            No active projects.
-                        </div>
-                    ) : (
-                        table.getRowModel().rows.map((row) => {
-                            const project = row.original;
-                            return (
-                                <div
-                                    key={row.id}
-                                    className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm active:scale-[0.98] transition-all"
-                                    onClick={isManagerUser ? () => handleEditClick(project) : undefined}
-                                >
-                                    <div className="flex items-center gap-3 mb-4">
-                                        <div className="w-10 h-10 rounded-xl bg-orange-500/10 text-orange-600 flex items-center justify-center font-bold">
-                                            <IoBriefcase size={20} />
-                                        </div>
-                                        <div>
-                                            <h3 className="font-bold text-slate-900">{project.name}</h3>
-                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                                                Manager: {project.managerId?.name || 'Unknown'}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-between items-center pt-4 border-t border-slate-50">
-                                        <div className="flex flex-col">
-                                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Timeline</span>
-                                            <span className="text-[11px] font-bold text-slate-700">
-                                                {project.endDate ? format(new Date(project.endDate), 'MMM dd, yyyy') : 'No Target'}
-                                            </span>
-                                        </div>
-                                        {isManagerUser && (
-                                            <div className="p-2 rounded-xl bg-blue-50 text-blue-600">
-                                                <IoPencil size={18} />
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            );
-                        })
-                    )}
                 </div>
             </motion.div>
 

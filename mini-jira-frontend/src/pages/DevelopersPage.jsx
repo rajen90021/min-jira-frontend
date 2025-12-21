@@ -153,7 +153,7 @@ const DevelopersPage = () => {
     });
 
     return (
-        <div className="h-full flex flex-col p-2 md:p-8 space-y-2 md:space-y-6 bg-transparent overflow-hidden">
+        <div className="h-full flex flex-col p-2 md:p-8 space-y-2 md:space-y-6 bg-transparent overflow-hidden min-w-0">
             {/* Page Header - Fixed */}
             <motion.div
                 initial={{ opacity: 0, x: -20 }}
@@ -211,11 +211,10 @@ const DevelopersPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="glass-card rounded-[32px] overflow-hidden flex-1 min-h-0 flex flex-col bg-white  border border-slate-200  shadow-sm"
+                className="glass-card rounded-[32px] overflow-hidden flex-1 min-h-0 min-w-0 flex flex-col bg-white  border border-slate-200  shadow-sm"
             >
-                {/* Desktop View */}
-                <div className="hidden md:block overflow-auto scrollbar-hide flex-1">
-                    <table className="w-full text-left border-collapse min-w-[1000px]">
+                <div className="overflow-x-auto overflow-y-auto flex-1 min-w-0">
+                    <table className="w-full text-left border-separate border-spacing-0 min-w-[1000px]">
                         <thead className="bg-slate-50  sticky top-0 z-10 border-b border-slate-200 ">
                             {table.getHeaderGroups().map((headerGroup) => (
                                 <tr key={headerGroup.id}>
@@ -223,7 +222,7 @@ const DevelopersPage = () => {
                                         <th
                                             key={header.id}
                                             onClick={header.column.getToggleSortingHandler()}
-                                            className="p-4 md:p-6 text-[10px] font-black text-slate-500  uppercase tracking-widest cursor-pointer hover:bg-slate-100 transition-colors select-none"
+                                            className="p-4 md:p-6 text-[10px] font-black text-slate-500  uppercase tracking-widest cursor-pointer hover:bg-slate-100 transition-colors select-none whitespace-nowrap"
                                         >
                                             <div className="flex items-center gap-2">
                                                 {flexRender(header.column.columnDef.header, header.getContext())}
@@ -264,55 +263,6 @@ const DevelopersPage = () => {
                             )}
                         </tbody>
                     </table>
-                </div>
-
-                {/* Mobile View */}
-                <div className="md:hidden flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 min-h-[60vh]">
-                    {isLoading ? (
-                        <div className="space-y-4">
-                            {[1, 2, 3].map(i => (
-                                <div key={i} className="bg-white p-6 rounded-3xl border border-slate-100 animate-pulse">
-                                    <div className="h-4 w-1/2 bg-slate-100 rounded-full mb-3" />
-                                    <div className="h-3 w-1/4 bg-slate-50 rounded-full" />
-                                </div>
-                            ))}
-                        </div>
-                    ) : table.getRowModel().rows.length === 0 ? (
-                        <div className="p-8 text-center text-slate-400 font-black uppercase text-[10px] tracking-widest opacity-50">
-                            No personnel detected.
-                        </div>
-                    ) : (
-                        table.getRowModel().rows.map((row) => {
-                            const personnel = row.original;
-                            return (
-                                <div
-                                    key={row.id}
-                                    className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm active:scale-[0.98] transition-all"
-                                    onClick={isManagerUser ? () => handleEditClick(personnel) : undefined}
-                                >
-                                    <div className="flex items-center gap-4 mb-4">
-                                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-black text-sm shadow-md">
-                                            {personnel.name?.charAt(0).toUpperCase() || '?'}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <h3 className="font-bold text-slate-900 truncate">{personnel.name}</h3>
-                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest truncate">{personnel.email}</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-between items-center pt-4 border-t border-slate-50">
-                                        <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${personnel.role === USER_ROLES.MANAGER ? 'bg-purple-50 text-purple-600 border-purple-100' : 'bg-blue-50 text-blue-600 border-blue-100'}`}>
-                                            {personnel.role}
-                                        </span>
-                                        {isManagerUser && (
-                                            <div className="p-2 rounded-xl bg-blue-50 text-blue-600">
-                                                <IoPencil size={18} />
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            );
-                        })
-                    )}
                 </div>
             </motion.div>
 

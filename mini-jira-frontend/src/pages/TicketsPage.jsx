@@ -253,7 +253,7 @@ const TicketsPage = () => {
     });
 
     return (
-        <div className="h-full flex flex-col gap-2 md:gap-6 p-2 md:p-8 max-w-[1600px] mx-auto w-full overflow-hidden">
+        <div className="h-full flex flex-col gap-2 md:gap-6 p-2 md:p-8 max-w-[1600px] mx-auto w-full overflow-hidden min-w-0">
             {/* Header Section */}
             <motion.div
                 initial={{ opacity: 0, y: -20 }}
@@ -311,15 +311,14 @@ const TicketsPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="glass-card rounded-[32px] overflow-hidden flex-1 min-h-0 flex flex-col shadow-sm border border-slate-100 bg-white"
+                className="glass-card rounded-[32px] overflow-hidden flex-1 min-h-0 min-w-0 flex flex-col shadow-sm border border-slate-100 bg-white"
             >
-                {/* Desktop View */}
-                <div className="hidden md:block overflow-x-auto overflow-y-auto flex-1">
+                <div className="overflow-x-auto overflow-y-auto flex-1 min-w-0">
                     <table className="w-full text-left min-w-[1000px] border-separate border-spacing-0">
                         <thead className="sticky top-0 z-10 bg-slate-50/80 backdrop-blur-md border-b border-slate-100">
                             <tr>
                                 {table.getHeaderGroups()[0].headers.map((header) => (
-                                    <th key={header.id} className="p-6 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                                    <th key={header.id} className="p-6 text-[10px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">
                                         {flexRender(header.column.columnDef.header, header.getContext())}
                                     </th>
                                 ))}
@@ -358,67 +357,6 @@ const TicketsPage = () => {
                             )}
                         </tbody>
                     </table>
-                </div>
-
-                {/* Mobile View */}
-                <div className="md:hidden flex-1 overflow-y-auto p-2 md:p-4 space-y-2 md:space-y-4 bg-slate-50/50 min-h-[60vh]">
-                    {isLoading ? (
-                        <div className="space-y-4">
-                            {[1, 2, 3, 4, 5].map(i => (
-                                <div key={i} className="bg-white p-6 rounded-3xl border border-slate-100 animate-pulse">
-                                    <div className="h-4 w-1/2 bg-slate-100 rounded-full mb-3" />
-                                    <div className="h-3 w-1/4 bg-slate-50 rounded-full" />
-                                </div>
-                            ))}
-                        </div>
-                    ) : table.getRowModel().rows.length === 0 ? (
-                        <div className="p-10 text-center">
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">No tickets in matrix.</p>
-                        </div>
-                    ) : (
-                        table.getRowModel().rows.map((row) => {
-                            const ticket = row.original;
-                            return (
-                                <div
-                                    key={row.id}
-                                    className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm active:scale-[0.98] transition-all"
-                                    onClick={() => handleEditClick(ticket)}
-                                >
-                                    <div className="flex justify-between items-start mb-4">
-                                        <div className="flex flex-wrap gap-2">
-                                            <StatusBadge status={ticket.status} type="ticket" />
-                                            <span className="px-2 py-1 rounded-md bg-slate-100 text-[9px] font-black text-slate-500 uppercase tracking-widest border border-slate-200">
-                                                {ticket.priority}
-                                            </span>
-                                        </div>
-                                        <span className="text-[10px] font-black text-slate-400 uppercase">#{ticket._id.slice(-6).toUpperCase()}</span>
-                                    </div>
-                                    <h3 className="font-bold text-slate-900 mb-4 line-clamp-2 leading-tight">{ticket.title}</h3>
-
-                                    <div className="flex justify-between items-center pt-4 border-t border-slate-50">
-                                        <div className="flex -space-x-2">
-                                            {ticket.assignees?.slice(0, 3).map((a, i) => (
-                                                <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-blue-100 flex items-center justify-center text-[10px] font-black text-blue-700">
-                                                    {a.name?.charAt(0)}
-                                                </div>
-                                            ))}
-                                            {ticket.assignees?.length > 3 && (
-                                                <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-black text-slate-500">
-                                                    +{ticket.assignees.length - 3}
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="flex items-center gap-1.5 text-slate-400">
-                                            <IoTimeOutline size={14} />
-                                            <span className="text-[10px] font-black uppercase tracking-widest">
-                                                {format(new Date(ticket.createdAt), 'MMM dd')}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })
-                    )}
                 </div>
             </motion.div>
 
