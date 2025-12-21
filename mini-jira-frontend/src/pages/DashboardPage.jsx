@@ -105,11 +105,11 @@ const DashboardPage = () => {
     const recentTickets = tickets?.slice(0, 5) || [];
 
     return (
-        <div className="h-full relative flex flex-col p-8 bg-white transition-colors duration-500 overflow-hidden">
+        <div className="h-full relative flex flex-col p-4 md:p-8 bg-white transition-colors duration-500 overflow-hidden">
             <CoreBackground />
 
             {/* Header Hub */}
-            <div className="flex-shrink-0 relative z-10 mb-8 flex justify-between items-end">
+            <div className="flex-shrink-0 relative z-10 mb-6 md:mb-8 flex justify-between items-end">
                 <div>
                     <motion.div
                         initial={{ opacity: 0, x: -10 }}
@@ -137,7 +137,7 @@ const DashboardPage = () => {
                 </div>
             </div>
 
-            <div className="flex-1 min-h-0 overflow-auto scrollbar-hide space-y-8 relative z-10 pb-10">
+            <div className="flex-1 min-h-0 overflow-auto scrollbar-hide space-y-6 md:space-y-8 relative z-10 pb-10">
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <StatCard

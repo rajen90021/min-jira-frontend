@@ -184,11 +184,11 @@ const KanbanBoardPage = () => {
     ) : null;
 
     return (
-        <div className="p-8 space-y-8 bg-transparent min-h-full overflow-hidden flex flex-col">
+        <div className="p-4 md:p-8 space-y-4 md:space-y-8 bg-transparent min-h-full overflow-hidden flex flex-col">
             <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6"
+                className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
             >
                 <div>
                     <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">

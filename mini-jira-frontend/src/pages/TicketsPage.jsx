@@ -1,98 +1,52 @@
-import { useMemo, useState, useEffect, Fragment } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import {
     useReactTable,
     getCoreRowModel,
+    getFilteredRowModel,
+    getPaginationRowModel,
+    getSortedRowModel,
     flexRender,
 } from '@tanstack/react-table';
-import { useDispatch, useSelector } from 'react-redux';
-import ticketService from '../services/ticketService';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+    IoAdd,
+    IoSearch,
+    IoFilter,
+    IoChevronDown,
+    IoTicket,
+    IoTimeOutline,
+    IoPerson,
+    IoCreate,
+    IoTrash,
+    IoSync
+} from 'react-icons/io5';
+import { format } from 'date-fns';
+import { useToast } from '../contexts/ToastContext';
 
-import { motion } from 'framer-motion';
-import { Listbox, Transition } from '@headlessui/react';
 import {
     fetchTicketsStart, fetchTicketsSuccess, fetchTicketsFailure,
     deleteTicketStart, deleteTicketSuccess, deleteTicketFailure
 } from '../store/slices/ticketSlice';
+import ticketService from '../services/ticketService';
+import SkeletonLoader from '../components/SkeletonLoader';
+import EmptyState from '../components/EmptyState';
 import CreateTicketDrawer from '../components/CreateTicketDrawer';
 import ConfirmationModal from '../components/ConfirmationModal';
 import AssigneesModal from '../components/AssigneesModal';
-import StatusBadge from '../components/StatusBadge';
-import { format } from 'date-fns';
-import SkeletonLoader from '../components/SkeletonLoader';
-import EmptyState from '../components/EmptyState';
 import TimeTrackingModal from '../components/TimeTrackingModal';
-import { IoAdd, IoSearch, IoTicket, IoPencil, IoTrash, IoChevronDown, IoFilter, IoTime } from "react-icons/io5";
-
-const SORT_OPTIONS = [
-    { name: 'Newest First', value: 'createdAt', order: 'desc' },
-    { name: 'Oldest First', value: 'createdAt', order: 'asc' },
-    { name: 'Title (A-Z)', value: 'title', order: 'asc' },
-];
-
-const STATUS_OPTIONS = ['Open', 'In Progress', 'Resolved', 'Closed'];
-const PRIORITY_OPTIONS = ['Low', 'Medium', 'High', 'Critical'];
-
-const FilterDropdown = ({ title, value, options, onChange, clearable }) => (
-    <Listbox value={value} onChange={onChange}>
-        <div className="relative mt-1">
-            <Listbox.Button className="relative w-full cursor-default rounded-2xl bg-white py-3 pl-4 pr-10 text-left border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-[10px] font-black uppercase tracking-widest shadow-sm transition-all hover:bg-slate-50">
-                <span className={`block truncate ${!value ? 'text-gray-500' : 'text-gray-900'}`}>
-                    {value?.name || value || title}
-                </span>
-                <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                    <IoChevronDown className="h-4 w-4 text-gray-400" aria-hidden="true" />
-                </span>
-            </Listbox.Button>
-            <Transition
-                as={Fragment}
-                leave="transition ease-in duration-100"
-                leaveFrom="opacity-100"
-                leaveTo="opacity-0"
-            >
-                <Listbox.Options className="absolute z-20 mt-2 max-h-60 w-full min-w-[200px] overflow-auto rounded-2xl bg-white py-2 text-xs shadow-2xl focus:outline-none border border-slate-200">
-                    {clearable && (
-                        <Listbox.Option
-                            className={({ active }) =>
-                                `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-blue-50 text-blue-600' : 'text-gray-500'
-                                }`
-                            }
-                            value={null}
-                        >
-                            <span className="block truncate italic">All {title}</span>
-                        </Listbox.Option>
-                    )}
-                    {options.map((option, idx) => (
-                        <Listbox.Option
-                            key={idx}
-                            className={({ active }) =>
-                                `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-blue-50 text-blue-900' : 'text-gray-900'
-                                }`
-                            }
-                            value={option.value || option}
-                        >
-                            {({ selected }) => (
-                                <>
-                                    <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
-                                        {option.name || option}
-                                    </span>
-                                    {selected ? (
-                                        <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-600">
-                                            <IoFilter className="h-4 w-4" aria-hidden="true" />
-                                        </span>
-                                    ) : null}
-                                </>
-                            )}
-                        </Listbox.Option>
-                    ))}
-                </Listbox.Options>
-            </Transition>
-        </div>
-    </Listbox>
-);
+import StatusBadge from '../components/StatusBadge';
+import { Listbox, Transition } from '@headlessui/react';
 
 const TicketsPage = () => {
     const dispatch = useDispatch();
-    const { tickets, isLoading, totalTickets, totalPages } = useSelector((state) => state.tickets);
+    const { tickets, isLoading } = useSelector((state) => state.tickets);
+    const { user } = useSelector((state) => state.auth);
+    const { showToast } = useToast();
+
+    const [globalFilter, setGlobalFilter] = useState('');
+    const [statusFilter, setStatusFilter] = useState('All');
+    const [priorityFilter, setPriorityFilter] = useState('All');
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [ticketToEdit, setTicketToEdit] = useState(null);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -102,30 +56,51 @@ const TicketsPage = () => {
     const [timeModalOpen, setTimeModalOpen] = useState(false);
     const [ticketToLogTime, setTicketToLogTime] = useState(null);
 
+    useEffect(() => {
+        const loadTickets = async () => {
+            dispatch(fetchTicketsStart());
+            try {
+                const data = await ticketService.getTickets();
+                dispatch(fetchTicketsSuccess(data));
+            } catch (error) {
+                dispatch(fetchTicketsFailure(error.message));
+                showToast(error.message || 'Failed to load tickets', 'error');
+            }
+        };
+        loadTickets();
+    }, [dispatch]);
+
     const handleEditClick = (ticket) => {
         setTicketToEdit(ticket);
         setIsDrawerOpen(true);
     };
 
-    const handleDeleteClick = (ticketId) => {
-        setTicketToDelete(ticketId);
+    const handleDeleteClick = (ticket) => {
+        setTicketToDelete(ticket);
         setDeleteModalOpen(true);
     };
 
     const confirmDelete = async () => {
-        if (!ticketToDelete) return;
-
         dispatch(deleteTicketStart());
         try {
-            await ticketService.deleteTicket(ticketToDelete);
-            dispatch(deleteTicketSuccess(ticketToDelete));
+            await ticketService.deleteTicket(ticketToDelete._id);
+            dispatch(deleteTicketSuccess(ticketToDelete._id));
+            showToast('Ticket deleted successfully', 'success');
             setDeleteModalOpen(false);
-            setTicketToDelete(null);
         } catch (error) {
-            const msg = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
-            dispatch(deleteTicketFailure(msg));
-            setDeleteModalOpen(false);
+            dispatch(deleteTicketFailure(error.message));
+            showToast(error.message || 'Failed to delete ticket', 'error');
         }
+    };
+
+    const handleLogTimeClick = (ticket) => {
+        setTicketToLogTime(ticket);
+        setTimeModalOpen(true);
+    };
+
+    const handleShowAssignees = (assignees) => {
+        setCurrentAssignees(assignees);
+        setAssigneesModalOpen(true);
     };
 
     const handleDrawerClose = () => {
@@ -133,106 +108,34 @@ const TicketsPage = () => {
         setTicketToEdit(null);
     };
 
-    // Table State
-    const [globalFilter, setGlobalFilter] = useState('');
-    const [statusFilter, setStatusFilter] = useState(null);
-    const [priorityFilter, setPriorityFilter] = useState(null);
-    const [sortConfig, setSortConfig] = useState(SORT_OPTIONS[0]);
-
-    const [{ pageIndex, pageSize }, setPagination] = useState({
-        pageIndex: 0,
-        pageSize: 10,
-    });
-
-    const pagination = useMemo(
-        () => ({
-            pageIndex,
-            pageSize,
-        }),
-        [pageIndex, pageSize]
-    );
-
-    // Debounce search term
-    const [debouncedSearch, setDebouncedSearch] = useState(globalFilter);
-    useEffect(() => {
-        const timer = setTimeout(() => setDebouncedSearch(globalFilter), 500);
-        return () => clearTimeout(timer);
-    }, [globalFilter]);
-
-    // Reset loop
-    useEffect(() => {
-        setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-    }, [debouncedSearch, statusFilter, priorityFilter]);
-
-    // Fetch tickets
-    useEffect(() => {
-        const fetchTickets = async () => {
-            dispatch(fetchTicketsStart());
-            try {
-                const params = {
-                    page: pageIndex + 1,
-                    limit: pageSize,
-                    search: debouncedSearch,
-                    status: statusFilter,
-                    priority: priorityFilter,
-                    sortBy: sortConfig.value,
-                    order: sortConfig.order,
-                };
-                const data = await ticketService.getTickets(params);
-                dispatch(fetchTicketsSuccess(data));
-            } catch (error) {
-                const msg = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
-                dispatch(fetchTicketsFailure(msg));
-            }
-        };
-        fetchTickets();
-    }, [dispatch, pageIndex, pageSize, debouncedSearch, statusFilter, priorityFilter, sortConfig, isDrawerOpen]);
+    const filteredData = useMemo(() => {
+        return tickets.filter(ticket => {
+            const matchesStatus = statusFilter === 'All' || ticket.status === statusFilter;
+            const matchesPriority = priorityFilter === 'All' || ticket.priority === priorityFilter;
+            return matchesStatus && matchesPriority;
+        });
+    }, [tickets, statusFilter, priorityFilter]);
 
     const columns = useMemo(
         () => [
             {
-                header: 'Ticket',
+                header: 'Ticket Details',
                 accessorKey: 'title',
-                cell: (info) => (
-                    <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-pink-500/10 text-pink-500 flex items-center justify-center font-bold">
-                            <IoTicket />
-                        </div>
-                        <div>
-                            <div className="font-medium text-gray-900">{info.getValue()}</div>
-                            <div className="text-xs text-gray-500">#{info.row.original._id.slice(-6).toUpperCase()}</div>
-                        </div>
-                    </div>
-                ),
-            },
-            {
-                header: 'Assignees',
-                accessorKey: 'assignees',
-                cell: (info) => {
-                    const assignees = info.getValue() || [];
-                    if (assignees.length === 0) return <span className="text-gray-400 text-sm">Unassigned</span>;
-
+                cell: ({ row }) => {
+                    const ticket = row.original;
                     return (
-                        <div
-                            className="flex -space-x-1.5 overflow-hidden hover:opacity-80 transition-opacity cursor-pointer p-1 rounded-md hover:bg-gray-50"
-                            onClick={() => {
-                                setCurrentAssignees(assignees);
-                                setAssigneesModalOpen(true);
-                            }}
-                        >
-                            {assignees.slice(0, 4).map((assignee, index) => (
-                                <div
-                                    key={assignee._id || index}
-                                    className="relative inline-block h-8 w-8 rounded-full ring-2 ring-white bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-xs font-bold text-blue-700 shadow-sm"
-                                >
-                                    {assignee.name ? assignee.name.charAt(0).toUpperCase() : '?'}
+                        <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold shadow-sm">
+                                <IoSync size={20} className={isLoading ? 'animate-spin' : ''} />
+                            </div>
+                            <div>
+                                <h3 className="font-bold text-slate-900 leading-tight mb-1">{ticket.title}</h3>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">#{ticket._id.slice(-6).toUpperCase()}</span>
+                                    <span className="text-[10px] font-black text-slate-300">•</span>
+                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{ticket.type || 'Task'}</span>
                                 </div>
-                            ))}
-                            {assignees.length > 4 && (
-                                <div className="relative inline-block h-8 w-8 rounded-full ring-2 ring-white bg-gray-100 flex items-center justify-center text-xs font-medium text-gray-500">
-                                    +{assignees.length - 4}
-                                </div>
-                            )}
+                            </div>
                         </div>
                     );
                 },
@@ -240,213 +143,213 @@ const TicketsPage = () => {
             {
                 header: 'Status',
                 accessorKey: 'status',
-                cell: (info) => <StatusBadge status={info.getValue() || 'Open'} type="ticket" />,
+                cell: ({ getValue }) => <StatusBadge status={getValue()} type="ticket" />,
             },
             {
                 header: 'Priority',
                 accessorKey: 'priority',
-                cell: (info) => {
-                    const low = info.getValue()?.toLowerCase() || 'low';
-                    let color = 'text-gray-500';
-                    if (low === 'medium') color = 'text-yellow-500';
-                    if (low === 'high') color = 'text-orange-500';
-                    if (low === 'critical') color = 'text-red-500';
-                    return <span className={`font-medium ${color}`}>{info.getValue()}</span>
-                }
+                cell: ({ getValue }) => {
+                    const priority = getValue();
+                    const colors = {
+                        High: 'text-rose-600 bg-rose-50 border-rose-100',
+                        Medium: 'text-amber-600 bg-amber-50 border-amber-100',
+                        Low: 'text-emerald-600 bg-emerald-50 border-emerald-100',
+                    };
+                    return (
+                        <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${colors[priority]}`}>
+                            {priority}
+                        </span>
+                    );
+                },
             },
             {
-                header: 'Created',
-                accessorKey: 'createdAt',
-                cell: (info) => {
-                    const date = info.getValue();
-                    return <span className="text-gray-500 text-sm">{date ? format(new Date(date), 'MMM dd, yyyy') : '-'}</span>;
+                header: 'Squad',
+                accessorKey: 'assignees',
+                cell: ({ getValue }) => {
+                    const assignees = getValue() || [];
+                    return (
+                        <div
+                            className="flex -space-x-2 cursor-pointer hover:scale-105 transition-transform"
+                            onClick={() => handleShowAssignees(assignees)}
+                        >
+                            {assignees.slice(0, 3).map((a, i) => (
+                                <div
+                                    key={i}
+                                    className="w-8 h-8 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-black text-slate-600 shadow-sm"
+                                    title={a.name}
+                                >
+                                    {a.name?.charAt(0)}
+                                </div>
+                            ))}
+                            {assignees.length > 3 && (
+                                <div className="w-8 h-8 rounded-full border-2 border-white bg-blue-600 flex items-center justify-center text-[10px] font-black text-white shadow-sm">
+                                    +{assignees.length - 3}
+                                </div>
+                            )}
+                            {assignees.length === 0 && (
+                                <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-50 flex items-center justify-center text-slate-400">
+                                    <IoPerson size={14} />
+                                </div>
+                            )}
+                        </div>
+                    );
                 },
+            },
+            {
+                header: 'Timeline',
+                accessorKey: 'createdAt',
+                cell: ({ getValue }) => (
+                    <div className="flex items-center gap-2 text-slate-500">
+                        <IoTimeOutline size={16} className="text-blue-500" />
+                        <span className="text-[11px] font-bold">{format(new Date(getValue()), 'MMM dd, yyyy')}</span>
+                    </div>
+                ),
             },
             {
                 header: 'Actions',
                 id: 'actions',
-                cell: (info) => (
-                    <div className="flex items-center gap-2">
-                        <button
-                            onClick={() => {
-                                setTicketToLogTime(info.row.original);
-                                setTimeModalOpen(true);
-                            }}
-                            className="p-1.5 text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
-                            title="Log Time"
-                        >
-                            <IoTime size={18} />
-                        </button>
-                        <button
-                            onClick={() => handleEditClick(info.row.original)}
-                            className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
-                            title="Edit"
-                        >
-                            <IoPencil size={18} />
-                        </button>
-                        <button
-                            onClick={() => handleDeleteClick(info.row.original._id)}
-                            className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                            title="Delete"
-                        >
-                            <IoTrash size={18} />
-                        </button>
-                    </div>
-                ),
+                cell: ({ row }) => {
+                    const ticket = row.original;
+                    return (
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => handleLogTimeClick(ticket)}
+                                className="p-2.5 bg-slate-50 text-slate-500 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-all group"
+                                title="Log Time"
+                            >
+                                <IoTimeOutline size={18} className="group-hover:rotate-12 transition-transform" />
+                            </button>
+                            <button
+                                onClick={() => handleEditClick(ticket)}
+                                className="p-2.5 bg-slate-50 text-slate-500 hover:bg-emerald-50 hover:text-emerald-600 rounded-xl transition-all"
+                            >
+                                <IoCreate size={18} />
+                            </button>
+                            <button
+                                onClick={() => handleDeleteClick(ticket)}
+                                className="p-2.5 bg-slate-50 text-slate-500 hover:bg-rose-50 hover:text-rose-600 rounded-xl transition-all"
+                            >
+                                <IoTrash size={18} />
+                            </button>
+                        </div>
+                    );
+                },
             },
         ],
-        []
+        [isLoading]
     );
 
     const table = useReactTable({
-        data: tickets || [],
+        data: filteredData,
         columns,
-        pageCount: totalPages,
         state: {
-            pagination,
             globalFilter,
         },
-        onPaginationChange: setPagination,
         onGlobalFilterChange: setGlobalFilter,
-        manualPagination: true,
-        manualFiltering: true,
         getCoreRowModel: getCoreRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        getSortedRowModel: getSortedRowModel(),
     });
 
     return (
-        <div className="h-full flex flex-col p-8 space-y-6 bg-transparent overflow-hidden">
-            {/* Page Header - Fixed */}
+        <div className="h-full flex flex-col gap-2 md:gap-6 p-2 md:p-8 max-w-[1600px] mx-auto w-full overflow-hidden">
+            {/* Header Section */}
             <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 flex-shrink-0"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 flex-shrink-0"
             >
                 <div>
-                    <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-                        Tickets
-                    </h1>
-                    <p className="text-gray-500 font-medium">Manage and track your project issues with AI precision.</p>
+                    <h1 className="text-2xl md:text-4xl font-black text-slate-900 mb-1 tracking-tight">Issue Command</h1>
+                    <p className="text-slate-500 font-bold uppercase text-[9px] md:text-[10px] tracking-[0.2em]">Deployment Archive & Task Matrix</p>
                 </div>
                 <motion.button
-                    whileHover={{ scale: 1.05, boxShadow: '0 20px 25px -5px rgba(59, 130, 246, 0.4)' }}
-                    whileTap={{ scale: 0.95 }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={() => {
                         setTicketToEdit(null);
                         setIsDrawerOpen(true);
                     }}
-                    className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-6 py-3 rounded-2xl shadow-xl transition-all font-bold text-sm min-w-[160px] justify-center"
+                    className="w-full md:w-auto flex items-center gap-2 px-6 py-3 md:px-8 md:py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl shadow-lg shadow-blue-500/20 transition-all font-black text-[10px] md:text-xs uppercase tracking-widest justify-center"
                 >
-                    <IoAdd size={24} />
+                    <IoAdd size={18} />
                     New Ticket
                 </motion.button>
             </motion.div>
 
-            {/* Filter Section - Fixed */}
-            <div className="flex flex-col xl:flex-row gap-6 justify-between items-start xl:items-center flex-shrink-0">
-                <div className="glass-card relative w-full xl:w-96 rounded-2xl">
-                    <IoSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+            {/* Filter Section */}
+            <div className="flex flex-col xl:flex-row gap-2 md:gap-4 items-stretch xl:items-center justify-between flex-shrink-0">
+                <div className="relative flex-1 max-w-xl">
+                    <IoSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input
                         value={globalFilter ?? ''}
                         onChange={(e) => setGlobalFilter(e.target.value)}
-                        placeholder="Search tickets by title..."
-                        className="w-full bg-transparent border-none rounded-2xl pl-12 pr-4 py-3.5 outline-none text-gray-700 transition-all placeholder:text-gray-400 font-medium"
+                        placeholder="Search ticket matrix..."
+                        className="w-full bg-white border border-slate-100 rounded-2xl pl-12 pr-4 py-3 md:py-4 outline-none text-slate-900 font-bold transition-all shadow-sm focus:border-blue-500/50"
                     />
                 </div>
 
-                <div className="flex w-full xl:w-auto gap-3 items-center flex-wrap">
-                    {(statusFilter || priorityFilter || globalFilter || sortConfig.value !== 'createdAt') && (
-                        <button
-                            onClick={() => {
-                                setGlobalFilter('');
-                                setStatusFilter(null);
-                                setPriorityFilter(null);
-                                setSortConfig(SORT_OPTIONS[0]);
-                            }}
-                            className="text-sm text-red-500 hover:text-red-700 font-medium px-2 transition-colors whitespace-nowrap"
-                        >
-                            Clear All
-                        </button>
-                    )}
-                    <div className="w-48">
-                        <FilterDropdown
-                            title="Operation Status"
-                            value={statusFilter}
-                            options={STATUS_OPTIONS}
-                            onChange={setStatusFilter}
-                            clearable
-                        />
-                    </div>
-                    <div className="w-48">
-                        <FilterDropdown
-                            title="Priority"
-                            value={priorityFilter}
-                            options={PRIORITY_OPTIONS}
-                            onChange={setPriorityFilter}
-                            clearable
-                        />
-                    </div>
-                    <div className="w-48">
-                        <FilterDropdown
-                            title="Sort By"
-                            value={sortConfig}
-                            options={SORT_OPTIONS}
-                            onChange={setSortConfig}
-                        />
-                    </div>
+                <div className="flex flex-wrap items-center gap-3">
+                    <FilterDropdown
+                        value={statusFilter}
+                        onChange={setStatusFilter}
+                        options={['All', 'Open', 'In Progress', 'Resolved', 'Closed']}
+                        label="Status"
+                    />
+                    <FilterDropdown
+                        value={priorityFilter}
+                        onChange={setPriorityFilter}
+                        options={['All', 'High', 'Medium', 'Low']}
+                        label="Priority"
+                    />
                 </div>
             </div>
 
-            {/* Table Area - Scrollable */}
+            {/* Content Area */}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="glass-card rounded-[32px] overflow-hidden flex-1 min-h-0 flex flex-col shadow-sm"
+                className="glass-card rounded-[32px] overflow-hidden flex-1 min-h-0 flex flex-col shadow-sm border border-slate-100 bg-white"
             >
-                <div className="overflow-auto scrollbar-hide flex-1">
-                    <table className="w-full text-left min-w-[1000px]">
-                        <thead className="sticky top-0 z-10">
-                            <tr className="border-b border-slate-100 bg-slate-50">
+                {/* Desktop View */}
+                <div className="hidden md:block overflow-x-auto overflow-y-auto flex-1">
+                    <table className="w-full text-left min-w-[1000px] border-separate border-spacing-0">
+                        <thead className="sticky top-0 z-10 bg-slate-50/80 backdrop-blur-md border-b border-slate-100">
+                            <tr>
                                 {table.getHeaderGroups()[0].headers.map((header) => (
-                                    <th key={header.id} className="p-6 text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                                    <th key={header.id} className="p-6 text-[10px] font-black text-slate-500 uppercase tracking-widest">
                                         {flexRender(header.column.columnDef.header, header.getContext())}
                                     </th>
                                 ))}
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="divide-y divide-slate-50">
                             {isLoading ? (
                                 <tr>
-                                    <td colSpan={columns.length} className="p-4">
-                                        <SkeletonLoader.Table rows={10} cols={6} />
+                                    <td colSpan={columns.length} className="p-10">
+                                        <div className="flex flex-col items-center gap-4">
+                                            <IoSync size={40} className="text-blue-500 animate-spin" />
+                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Compiling Nodes...</p>
+                                        </div>
                                     </td>
                                 </tr>
                             ) : table.getRowModel().rows.length === 0 ? (
                                 <tr>
-                                    <td colSpan={columns.length} className="p-8">
+                                    <td colSpan={columns.length} className="p-20">
                                         <EmptyState
                                             title="No tickets found"
-                                            description="Try adjusting your filters or create a new ticket to get started."
-                                            icon={<IoTicket className="text-gray-400" />}
-                                            action={
-                                                <button
-                                                    onClick={() => {
-                                                        setTicketToEdit(null);
-                                                        setIsDrawerOpen(true);
-                                                    }}
-                                                    className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
-                                                >
-                                                    Create Ticket
-                                                </button>
-                                            }
+                                            description="Try adjusting your filters or create a new ticket."
+                                            icon={<IoFilter className="text-slate-300" size={48} />}
                                         />
                                     </td>
                                 </tr>
                             ) : (
                                 table.getRowModel().rows.map((row) => (
-                                    <tr key={row.id} className="hover:bg-gray-50 transition-colors">
+                                    <tr key={row.id} className="hover:bg-slate-50/50 transition-colors group">
                                         {row.getVisibleCells().map((cell) => (
-                                            <td key={cell.id} className="p-6 text-sm whitespace-nowrap">
+                                            <td key={cell.id} className="p-4 md:p-6 text-sm">
                                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                             </td>
                                         ))}
@@ -456,27 +359,93 @@ const TicketsPage = () => {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Mobile View */}
+                <div className="md:hidden flex-1 overflow-y-auto p-2 md:p-4 space-y-2 md:space-y-4 bg-slate-50/50 min-h-[60vh]">
+                    {isLoading ? (
+                        <div className="space-y-4">
+                            {[1, 2, 3, 4, 5].map(i => (
+                                <div key={i} className="bg-white p-6 rounded-3xl border border-slate-100 animate-pulse">
+                                    <div className="h-4 w-1/2 bg-slate-100 rounded-full mb-3" />
+                                    <div className="h-3 w-1/4 bg-slate-50 rounded-full" />
+                                </div>
+                            ))}
+                        </div>
+                    ) : table.getRowModel().rows.length === 0 ? (
+                        <div className="p-10 text-center">
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">No tickets in matrix.</p>
+                        </div>
+                    ) : (
+                        table.getRowModel().rows.map((row) => {
+                            const ticket = row.original;
+                            return (
+                                <div
+                                    key={row.id}
+                                    className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm active:scale-[0.98] transition-all"
+                                    onClick={() => handleEditClick(ticket)}
+                                >
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div className="flex flex-wrap gap-2">
+                                            <StatusBadge status={ticket.status} type="ticket" />
+                                            <span className="px-2 py-1 rounded-md bg-slate-100 text-[9px] font-black text-slate-500 uppercase tracking-widest border border-slate-200">
+                                                {ticket.priority}
+                                            </span>
+                                        </div>
+                                        <span className="text-[10px] font-black text-slate-400 uppercase">#{ticket._id.slice(-6).toUpperCase()}</span>
+                                    </div>
+                                    <h3 className="font-bold text-slate-900 mb-4 line-clamp-2 leading-tight">{ticket.title}</h3>
+
+                                    <div className="flex justify-between items-center pt-4 border-t border-slate-50">
+                                        <div className="flex -space-x-2">
+                                            {ticket.assignees?.slice(0, 3).map((a, i) => (
+                                                <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-blue-100 flex items-center justify-center text-[10px] font-black text-blue-700">
+                                                    {a.name?.charAt(0)}
+                                                </div>
+                                            ))}
+                                            {ticket.assignees?.length > 3 && (
+                                                <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-black text-slate-500">
+                                                    +{ticket.assignees.length - 3}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="flex items-center gap-1.5 text-slate-400">
+                                            <IoTimeOutline size={14} />
+                                            <span className="text-[10px] font-black uppercase tracking-widest">
+                                                {format(new Date(ticket.createdAt), 'MMM dd')}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })
+                    )}
+                </div>
             </motion.div>
 
-            {/* Pagination Hub - Fixed At Bottom */}
-            <div className="flex items-center justify-end gap-3 flex-shrink-0">
-                <button
-                    className="p-3 bg-white  border border-slate-200  rounded-2xl disabled:opacity-20 disabled:cursor-not-allowed hover:bg-slate-50 :bg-slate-800 transition-all shadow-sm"
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
-                >
-                    <IoChevronDown size={20} className="rotate-90 text-slate-500" />
-                </button>
-                <div className="bg-white border border-slate-100 px-6 py-3 rounded-2xl text-[10px] font-black text-slate-500 tracking-widest uppercase shadow-sm">
-                    Registry <span className="text-blue-600 mx-1">{table.getState().pagination.pageIndex + 1}</span> / {table.getPageCount() || 1}
+            {/* Pagination */}
+            <div className="flex items-center justify-between gap-4 flex-shrink-0">
+                <div className="hidden md:block text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    Showing <span className="text-slate-900">{table.getRowModel().rows.length}</span> of {filteredData.length} records
                 </div>
-                <button
-                    className="p-3 bg-white border border-slate-100 rounded-2xl disabled:opacity-20 disabled:cursor-not-allowed hover:bg-slate-50 transition-all shadow-sm"
-                    onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
-                >
-                    <IoChevronDown size={20} className="-rotate-90 text-slate-500" />
-                </button>
+                <div className="flex items-center gap-2 w-full md:w-auto">
+                    <button
+                        className="flex-1 md:flex-none p-4 bg-white border border-slate-200 rounded-2xl disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-50 transition-all shadow-sm"
+                        onClick={() => table.previousPage()}
+                        disabled={!table.getCanPreviousPage()}
+                    >
+                        <IoChevronDown size={20} className="rotate-90 mx-auto" />
+                    </button>
+                    <div className="px-6 py-4 bg-white border border-slate-100 rounded-2xl text-[10px] font-black text-slate-500 tracking-widest uppercase shadow-sm whitespace-nowrap">
+                        Page <span className="text-blue-600 font-black">{table.getState().pagination.pageIndex + 1}</span> of {table.getPageCount() || 1}
+                    </div>
+                    <button
+                        className="flex-1 md:flex-none p-4 bg-white border border-slate-200 rounded-2xl disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-50 transition-all shadow-sm"
+                        onClick={() => table.nextPage()}
+                        disabled={!table.getCanNextPage()}
+                    >
+                        <IoChevronDown size={20} className="-rotate-90 mx-auto" />
+                    </button>
+                </div>
             </div>
 
             <CreateTicketDrawer
@@ -510,5 +479,40 @@ const TicketsPage = () => {
         </div>
     );
 };
+
+const FilterDropdown = ({ value, onChange, options, label }) => (
+    <Listbox value={value} onChange={onChange}>
+        <div className="relative min-w-[140px]">
+            <Listbox.Button className="w-full bg-white border border-slate-100 rounded-2xl px-4 py-3 text-left shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all">
+                <span className="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">{label}</span>
+                <div className="flex items-center justify-between">
+                    <span className="block truncate text-xs font-bold text-slate-900">{value}</span>
+                    <IoChevronDown className="text-slate-400" />
+                </div>
+            </Listbox.Button>
+            <Transition
+                as={useMemo(() => (props) => <div {...props} />, [])}
+                leave="transition ease-in duration-100"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+            >
+                <Listbox.Options className="absolute z-[100] mt-2 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl py-2 focus:outline-none overflow-hidden">
+                    {options.map((option) => (
+                        <Listbox.Option
+                            key={option}
+                            className={({ active }) =>
+                                `cursor-pointer select-none py-3 px-5 transition-colors ${active ? 'bg-blue-50 text-blue-600' : 'text-slate-700'
+                                }`
+                            }
+                            value={option}
+                        >
+                            <span className="block truncate text-xs font-bold uppercase tracking-widest">{option}</span>
+                        </Listbox.Option>
+                    ))}
+                </Listbox.Options>
+            </Transition>
+        </div>
+    </Listbox>
+);
 
 export default TicketsPage;

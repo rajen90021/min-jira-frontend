@@ -160,18 +160,18 @@ const ProjectsPage = () => {
     });
 
     return (
-        <div className="h-full flex flex-col p-8 space-y-6 bg-transparent overflow-hidden">
+        <div className="h-full flex flex-col p-2 md:p-8 space-y-2 md:space-y-6 bg-transparent overflow-hidden">
             {/* Page Header - Fixed */}
             <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 flex-shrink-0"
+                className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 md:gap-6 flex-shrink-0"
             >
                 <div>
-                    <h1 className="text-4xl font-black text-slate-900 mb-2 tracking-tight">
+                    <h1 className="text-2xl md:text-4xl font-black text-slate-900 mb-1 tracking-tight">
                         Initiative Hubs
                     </h1>
-                    <p className="text-slate-500 font-bold uppercase text-[10px] tracking-[0.2em]">Project Architecture Management</p>
+                    <p className="text-slate-500 font-bold uppercase text-[9px] md:text-[10px] tracking-[0.2em]">Project Architecture Management</p>
                 </div>
                 <motion.button
                     whileHover={isManagerUser ? { scale: 1.02 } : {}}
@@ -181,25 +181,25 @@ const ProjectsPage = () => {
                         setIsDrawerOpen(true);
                     }}
                     disabled={!isManagerUser}
-                    className={`flex items-center gap-2 px-8 py-3.5 rounded-2xl shadow-lg transition-all font-black text-xs uppercase tracking-widest min-w-[200px] justify-center ${isManagerUser
+                    className={`flex items-center gap-2 px-6 py-3 md:px-8 md:py-3.5 rounded-2xl shadow-lg transition-all font-black text-[10px] md:text-xs uppercase tracking-widest min-w-[160px] md:min-w-[200px] justify-center ${isManagerUser
                         ? 'bg-blue-600 hover:bg-blue-700 text-white cursor-pointer'
                         : 'bg-slate-200 text-slate-400 cursor-not-allowed'
                         }`}
                 >
-                    <IoAdd size={24} />
+                    <IoAdd size={20} />
                     New Initiative
                 </motion.button>
             </motion.div>
 
             {/* Search Bar - Fixed */}
-            <div className="flex flex-col xl:flex-row gap-6 justify-between items-start xl:items-center flex-shrink-0">
+            <div className="flex flex-col xl:flex-row gap-2 md:gap-6 justify-between items-start xl:items-center flex-shrink-0">
                 <div className="glass-card relative w-full xl:w-96 rounded-2xl bg-white border border-slate-200">
                     <IoSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input
                         value={globalFilter ?? ''}
                         onChange={(e) => setGlobalFilter(e.target.value)}
                         placeholder="Search projects..."
-                        className="w-full bg-transparent border-none rounded-2xl pl-12 pr-4 py-4 outline-none text-slate-800 transition-all font-bold"
+                        className="w-full bg-transparent border-none rounded-2xl pl-12 pr-4 py-3 md:py-4 outline-none text-slate-800 transition-all font-bold"
                     />
                 </div>
             </div>
@@ -211,7 +211,8 @@ const ProjectsPage = () => {
                 transition={{ delay: 0.2 }}
                 className="glass-card rounded-[32px] overflow-hidden flex-1 min-h-0 flex flex-col shadow-sm"
             >
-                <div className="overflow-auto scrollbar-hide flex-1">
+                {/* Desktop Table View */}
+                <div className="hidden md:block overflow-x-auto overflow-y-auto flex-1">
                     <table className="w-full text-left border-collapse min-w-[1000px]">
                         <thead className="bg-slate-50 sticky top-0 z-10 border-b border-slate-200">
                             {table.getHeaderGroups().map((headerGroup) => (
@@ -220,7 +221,7 @@ const ProjectsPage = () => {
                                         <th
                                             key={header.id}
                                             onClick={header.column.getToggleSortingHandler()}
-                                            className="p-6 text-[10px] font-black text-slate-500 uppercase tracking-widest cursor-pointer hover:bg-slate-100 transition-colors select-none"
+                                            className="p-4 md:p-6 text-[10px] font-black text-slate-500 uppercase tracking-widest cursor-pointer hover:bg-slate-100 transition-colors select-none"
                                         >
                                             <div className="flex items-center gap-2">
                                                 {flexRender(header.column.columnDef.header, header.getContext())}
@@ -261,6 +262,60 @@ const ProjectsPage = () => {
                             )}
                         </tbody>
                     </table>
+                </div>
+
+                {/* Mobile Card View */}
+                <div className="md:hidden flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 min-h-[60vh]">
+                    {isLoading ? (
+                        <div className="space-y-4">
+                            {[1, 2, 3].map(i => (
+                                <div key={i} className="bg-white p-6 rounded-3xl border border-slate-100 animate-pulse">
+                                    <div className="h-4 w-1/2 bg-slate-100 rounded-full mb-3" />
+                                    <div className="h-3 w-1/4 bg-slate-50 rounded-full" />
+                                </div>
+                            ))}
+                        </div>
+                    ) : table.getRowModel().rows.length === 0 ? (
+                        <div className="p-8 text-center text-slate-400 font-black uppercase text-[10px] tracking-widest opacity-50">
+                            No active projects.
+                        </div>
+                    ) : (
+                        table.getRowModel().rows.map((row) => {
+                            const project = row.original;
+                            return (
+                                <div
+                                    key={row.id}
+                                    className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm active:scale-[0.98] transition-all"
+                                    onClick={isManagerUser ? () => handleEditClick(project) : undefined}
+                                >
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <div className="w-10 h-10 rounded-xl bg-orange-500/10 text-orange-600 flex items-center justify-center font-bold">
+                                            <IoBriefcase size={20} />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-bold text-slate-900">{project.name}</h3>
+                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                                Manager: {project.managerId?.name || 'Unknown'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between items-center pt-4 border-t border-slate-50">
+                                        <div className="flex flex-col">
+                                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Timeline</span>
+                                            <span className="text-[11px] font-bold text-slate-700">
+                                                {project.endDate ? format(new Date(project.endDate), 'MMM dd, yyyy') : 'No Target'}
+                                            </span>
+                                        </div>
+                                        {isManagerUser && (
+                                            <div className="p-2 rounded-xl bg-blue-50 text-blue-600">
+                                                <IoPencil size={18} />
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })
+                    )}
                 </div>
             </motion.div>
 

@@ -61,12 +61,12 @@ const ActivityTimelinePage = () => {
     };
 
     return (
-        <div className="h-full flex flex-col p-8 space-y-6 bg-transparent overflow-hidden relative">
+        <div className="h-full flex flex-col p-4 md:p-8 space-y-4 md:space-y-6 bg-transparent overflow-hidden relative">
             {/* Header - Fixed */}
             <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 flex-shrink-0"
+                className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 flex-shrink-0"
             >
                 <div>
                     <h1 className="text-4xl font-black text-slate-900 mb-2 tracking-tight">
@@ -77,7 +77,7 @@ const ActivityTimelinePage = () => {
             </motion.div>
 
             {/* Timeline - Scrollable */}
-            <div className="flex-1 min-h-0 overflow-auto scrollbar-hide">
+            <div className="flex-1 min-h-[60vh] overflow-auto scrollbar-hide">
                 <div className="max-w-5xl">
                     {isLoading ? (
                         <div className="space-y-6">
