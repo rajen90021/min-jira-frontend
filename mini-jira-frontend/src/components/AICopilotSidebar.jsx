@@ -81,29 +81,30 @@ const AICopilotSidebar = ({ isOpen, onClose }) => {
                         className="fixed right-0 top-0 h-screen w-[400px] z-[10000] glass-sidebar shadow-2xl flex flex-col"
                     >
                         {/* Header */}
-                        <div className="px-6 py-6 border-b border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-slate-900 flex items-center justify-between">
+                        <div className="px-6 py-6 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
-                                    <IoSparkles size={20} className="animate-pulse" />
+                                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-lg overflow-hidden flex-shrink-0">
+                                    <IoSparkles size={24} />
                                 </div>
                                 <div>
-                                    <h2 className="text-xl font-black bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                                        AI Copilot
-                                    </h2>
-                                    <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Xetabots Intelligence Core</p>
+                                    <h2 className="text-lg font-black text-slate-900 tracking-tight leading-tight">Xetabots AI Assistant</h2>
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Core Engine Active</span>
+                                    </div>
                                 </div>
                             </div>
                             <div className="flex items-center gap-2">
                                 <button
                                     onClick={clearChat}
                                     title="Clear History"
-                                    className="p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/5 rounded-xl text-gray-400 hover:text-rose-500 hover:bg-rose-500/10 transition-all"
+                                    className="p-2 bg-white border border-slate-200 rounded-xl text-gray-400 hover:text-rose-500 hover:bg-rose-500/10 transition-all"
                                 >
                                     <IoTrashOutline size={20} />
                                 </button>
                                 <button
                                     onClick={onClose}
-                                    className="p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/5 rounded-xl text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-all"
+                                    className="p-2 bg-white border border-slate-200 rounded-xl text-gray-400 hover:text-gray-900 transition-all"
                                 >
                                     <IoClose size={24} />
                                 </button>
@@ -111,7 +112,7 @@ const AICopilotSidebar = ({ isOpen, onClose }) => {
                         </div>
 
                         {/* Messages */}
-                        <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide bg-white dark:bg-[#020617]">
+                        <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide bg-slate-50/50">
                             {messages.map((msg, idx) => (
                                 <motion.div
                                     initial={{ opacity: 0, y: 10 }}
@@ -119,9 +120,9 @@ const AICopilotSidebar = ({ isOpen, onClose }) => {
                                     key={idx}
                                     className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                                 >
-                                    <div className={`max-w-[90%] p-4 rounded-3xl text-sm font-medium leading-relaxed shadow-sm ${msg.role === 'user'
-                                        ? 'bg-blue-600 text-white rounded-tr-none shadow-blue-500/20'
-                                        : 'bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-white/5 text-slate-800 dark:text-neutral-200 rounded-tl-none'
+                                    <div className={`max-w-[85%] p-4 rounded-3xl text-sm font-medium shadow-sm transition-all ${msg.role === 'user'
+                                        ? 'bg-blue-600 text-white rounded-tr-none ml-auto'
+                                        : 'bg-white text-slate-700 border border-slate-100 rounded-tl-none'
                                         }`}>
                                         {msg.content}
                                     </div>
@@ -129,10 +130,12 @@ const AICopilotSidebar = ({ isOpen, onClose }) => {
                             ))}
                             {isLoading && (
                                 <div className="flex justify-start">
-                                    <div className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-white/5 p-4 rounded-3xl rounded-tl-none flex gap-2 items-center">
-                                        <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                                        <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                                        <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" />
+                                    <div className="bg-white border border-slate-100 p-4 rounded-3xl rounded-tl-none shadow-sm">
+                                        <div className="flex space-x-2">
+                                            <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" />
+                                            <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce [animation-delay:-.3s]" />
+                                            <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce [animation-delay:-.5s]" />
+                                        </div>
                                     </div>
                                 </div>
                             )}
@@ -140,13 +143,13 @@ const AICopilotSidebar = ({ isOpen, onClose }) => {
                         </div>
 
                         {/* Input */}
-                        <div className="p-6 border-t border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-slate-900">
+                        <div className="p-6 border-t border-slate-100 bg-slate-50">
                             <form onSubmit={handleSendMessage} className="relative">
                                 <input
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
                                     placeholder="Ask your copilot..."
-                                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-2xl pl-5 pr-14 py-4 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-neutral-100 font-bold"
+                                    className="w-full bg-white border border-slate-200 rounded-2xl pl-5 pr-14 py-4 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 font-bold"
                                 />
                                 <button
                                     type="submit"

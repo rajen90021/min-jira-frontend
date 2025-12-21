@@ -2,11 +2,11 @@ import { motion } from 'framer-motion';
 
 const SkeletonBase = ({ className, ...props }) => (
     <div
-        className={`bg-gray-200 dark:bg-gray-800 relative overflow-hidden ${className}`}
+        className={`bg-gray-200  relative overflow-hidden ${className}`}
         {...props}
     >
         <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 dark:via-white/5 to-transparent"
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20  to-transparent"
             initial={{ x: '-100%' }}
             animate={{ x: '100%' }}
             transition={{
@@ -31,7 +31,7 @@ export const SkeletonCircle = ({ size = "10", className = "" }) => (
 );
 
 export const SkeletonCard = () => (
-    <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#1e1e1e] space-y-4">
+    <div className="p-4 rounded-xl border border-gray-200  bg-white [#1e1e1e] space-y-4">
         <div className="flex items-center gap-3">
             <SkeletonCircle size="3rem" />
             <div className="space-y-2 flex-1">
@@ -49,7 +49,7 @@ export const SkeletonCard = () => (
 
 export const SkeletonTable = ({ rows = 5, cols = 4 }) => (
     <div className="w-full">
-        <div className="flex gap-4 mb-4 pb-4 border-b border-gray-100 dark:border-gray-800">
+        <div className="flex gap-4 mb-4 pb-4 border-b border-gray-100 ">
             {Array.from({ length: cols }).map((_, i) => (
                 <SkeletonText key={i} className="h-4 flex-1 rounded" />
             ))}

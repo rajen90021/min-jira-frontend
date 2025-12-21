@@ -35,8 +35,8 @@ const PRIORITY_OPTIONS = ['Low', 'Medium', 'High', 'Critical'];
 const FilterDropdown = ({ title, value, options, onChange, clearable }) => (
     <Listbox value={value} onChange={onChange}>
         <div className="relative mt-1">
-            <Listbox.Button className="relative w-full cursor-default rounded-2xl bg-white dark:bg-slate-800 py-3 pl-4 pr-10 text-left border border-slate-200 dark:border-white/5 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-[10px] font-black uppercase tracking-widest shadow-sm transition-all hover:bg-slate-50 dark:hover:bg-slate-700">
-                <span className={`block truncate ${!value ? 'text-gray-500' : 'text-gray-900 dark:text-gray-200'}`}>
+            <Listbox.Button className="relative w-full cursor-default rounded-2xl bg-white py-3 pl-4 pr-10 text-left border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-[10px] font-black uppercase tracking-widest shadow-sm transition-all hover:bg-slate-50">
+                <span className={`block truncate ${!value ? 'text-gray-500' : 'text-gray-900'}`}>
                     {value?.name || value || title}
                 </span>
                 <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
@@ -49,11 +49,11 @@ const FilterDropdown = ({ title, value, options, onChange, clearable }) => (
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
             >
-                <Listbox.Options className="absolute z-20 mt-2 max-h-60 w-full min-w-[200px] overflow-auto rounded-2xl bg-white dark:bg-slate-800 py-2 text-xs shadow-2xl focus:outline-none border border-slate-200 dark:border-white/5">
+                <Listbox.Options className="absolute z-20 mt-2 max-h-60 w-full min-w-[200px] overflow-auto rounded-2xl bg-white py-2 text-xs shadow-2xl focus:outline-none border border-slate-200">
                     {clearable && (
                         <Listbox.Option
                             className={({ active }) =>
-                                `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-gray-500'
+                                `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-blue-50 text-blue-600' : 'text-gray-500'
                                 }`
                             }
                             value={null}
@@ -65,7 +65,7 @@ const FilterDropdown = ({ title, value, options, onChange, clearable }) => (
                         <Listbox.Option
                             key={idx}
                             className={({ active }) =>
-                                `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-900 dark:text-blue-100' : 'text-gray-900 dark:text-gray-200'
+                                `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-blue-50 text-blue-900' : 'text-gray-900'
                                 }`
                             }
                             value={option.value || option}
@@ -76,7 +76,7 @@ const FilterDropdown = ({ title, value, options, onChange, clearable }) => (
                                         {option.name || option}
                                     </span>
                                     {selected ? (
-                                        <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-600 dark:text-blue-400">
+                                        <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-600">
                                             <IoFilter className="h-4 w-4" aria-hidden="true" />
                                         </span>
                                     ) : null}
@@ -199,7 +199,7 @@ const TicketsPage = () => {
                             <IoTicket />
                         </div>
                         <div>
-                            <div className="font-medium text-gray-900 dark:text-gray-200">{info.getValue()}</div>
+                            <div className="font-medium text-gray-900">{info.getValue()}</div>
                             <div className="text-xs text-gray-500">#{info.row.original._id.slice(-6).toUpperCase()}</div>
                         </div>
                     </div>
@@ -214,7 +214,7 @@ const TicketsPage = () => {
 
                     return (
                         <div
-                            className="flex -space-x-1.5 overflow-hidden hover:opacity-80 transition-opacity cursor-pointer p-1 rounded-md hover:bg-gray-50 dark:hover:bg-[#2a2d2e]"
+                            className="flex -space-x-1.5 overflow-hidden hover:opacity-80 transition-opacity cursor-pointer p-1 rounded-md hover:bg-gray-50"
                             onClick={() => {
                                 setCurrentAssignees(assignees);
                                 setAssigneesModalOpen(true);
@@ -223,13 +223,13 @@ const TicketsPage = () => {
                             {assignees.slice(0, 4).map((assignee, index) => (
                                 <div
                                     key={assignee._id || index}
-                                    className="relative inline-block h-8 w-8 rounded-full ring-2 ring-white dark:ring-[#1e1e1e] bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/50 dark:to-blue-800/50 flex items-center justify-center text-xs font-bold text-blue-700 dark:text-blue-200 shadow-sm"
+                                    className="relative inline-block h-8 w-8 rounded-full ring-2 ring-white bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-xs font-bold text-blue-700 shadow-sm"
                                 >
                                     {assignee.name ? assignee.name.charAt(0).toUpperCase() : '?'}
                                 </div>
                             ))}
                             {assignees.length > 4 && (
-                                <div className="relative inline-block h-8 w-8 rounded-full ring-2 ring-white dark:ring-[#1e1e1e] bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-xs font-medium text-gray-500 dark:text-gray-400">
+                                <div className="relative inline-block h-8 w-8 rounded-full ring-2 ring-white bg-gray-100 flex items-center justify-center text-xs font-medium text-gray-500">
                                     +{assignees.length - 4}
                                 </div>
                             )}
@@ -272,7 +272,7 @@ const TicketsPage = () => {
                                 setTicketToLogTime(info.row.original);
                                 setTimeModalOpen(true);
                             }}
-                            className="p-1.5 text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 rounded-md transition-colors"
+                            className="p-1.5 text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
                             title="Log Time"
                         >
                             <IoTime size={18} />
@@ -325,7 +325,7 @@ const TicketsPage = () => {
                     <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
                         Tickets
                     </h1>
-                    <p className="text-gray-500 dark:text-neutral-400 font-medium">Manage and track your project issues with AI precision.</p>
+                    <p className="text-gray-500 font-medium">Manage and track your project issues with AI precision.</p>
                 </div>
                 <motion.button
                     whileHover={{ scale: 1.05, boxShadow: '0 20px 25px -5px rgba(59, 130, 246, 0.4)' }}
@@ -349,7 +349,7 @@ const TicketsPage = () => {
                         value={globalFilter ?? ''}
                         onChange={(e) => setGlobalFilter(e.target.value)}
                         placeholder="Search tickets by title..."
-                        className="w-full bg-transparent border-none rounded-2xl pl-12 pr-4 py-3.5 outline-none text-gray-700 dark:text-gray-200 transition-all placeholder:text-gray-400 font-medium"
+                        className="w-full bg-transparent border-none rounded-2xl pl-12 pr-4 py-3.5 outline-none text-gray-700 transition-all placeholder:text-gray-400 font-medium"
                     />
                 </div>
 
@@ -406,7 +406,7 @@ const TicketsPage = () => {
                 <div className="overflow-auto scrollbar-hide flex-1">
                     <table className="w-full text-left min-w-[1000px]">
                         <thead className="sticky top-0 z-10">
-                            <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900">
+                            <tr className="border-b border-slate-100 bg-slate-50">
                                 {table.getHeaderGroups()[0].headers.map((header) => (
                                     <th key={header.id} className="p-6 text-[10px] font-black text-gray-500 uppercase tracking-widest">
                                         {flexRender(header.column.columnDef.header, header.getContext())}
@@ -414,7 +414,7 @@ const TicketsPage = () => {
                                 ))}
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                        <tbody className="divide-y divide-slate-100">
                             {isLoading ? (
                                 <tr>
                                     <td colSpan={columns.length} className="p-4">
@@ -444,7 +444,7 @@ const TicketsPage = () => {
                                 </tr>
                             ) : (
                                 table.getRowModel().rows.map((row) => (
-                                    <tr key={row.id} className="hover:bg-gray-50 dark:hover:bg-[#2a2d2e] transition-colors">
+                                    <tr key={row.id} className="hover:bg-gray-50 transition-colors">
                                         {row.getVisibleCells().map((cell) => (
                                             <td key={cell.id} className="p-6 text-sm whitespace-nowrap">
                                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -461,17 +461,17 @@ const TicketsPage = () => {
             {/* Pagination Hub - Fixed At Bottom */}
             <div className="flex items-center justify-end gap-3 flex-shrink-0">
                 <button
-                    className="p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl disabled:opacity-20 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm"
+                    className="p-3 bg-white  border border-slate-200  rounded-2xl disabled:opacity-20 disabled:cursor-not-allowed hover:bg-slate-50 :bg-slate-800 transition-all shadow-sm"
                     onClick={() => table.previousPage()}
                     disabled={!table.getCanPreviousPage()}
                 >
                     <IoChevronDown size={20} className="rotate-90 text-slate-500" />
                 </button>
-                <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 px-6 py-3 rounded-2xl text-[10px] font-black text-slate-500 tracking-widest uppercase shadow-sm">
-                    Registry <span className="text-blue-600 dark:text-blue-500 mx-1">{table.getState().pagination.pageIndex + 1}</span> / {table.getPageCount() || 1}
+                <div className="bg-white border border-slate-100 px-6 py-3 rounded-2xl text-[10px] font-black text-slate-500 tracking-widest uppercase shadow-sm">
+                    Registry <span className="text-blue-600 mx-1">{table.getState().pagination.pageIndex + 1}</span> / {table.getPageCount() || 1}
                 </div>
                 <button
-                    className="p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl disabled:opacity-20 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm"
+                    className="p-3 bg-white border border-slate-100 rounded-2xl disabled:opacity-20 disabled:cursor-not-allowed hover:bg-slate-50 transition-all shadow-sm"
                     onClick={() => table.nextPage()}
                     disabled={!table.getCanNextPage()}
                 >

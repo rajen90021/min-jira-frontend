@@ -21,10 +21,10 @@ const KanbanCard = ({ ticket, onClick }) => {
     };
 
     const priorityConfig = {
-        Low: { bg: 'bg-emerald-50 dark:bg-emerald-900/10', text: 'text-emerald-600 dark:text-emerald-400', dot: 'bg-emerald-500', border: 'border-emerald-100 dark:border-emerald-500/20' },
-        Medium: { bg: 'bg-amber-50 dark:bg-amber-900/10', text: 'text-amber-600 dark:text-amber-400', dot: 'bg-amber-500', border: 'border-amber-100 dark:border-amber-500/20' },
-        High: { bg: 'bg-orange-50 dark:bg-orange-900/10', text: 'text-orange-600 dark:text-orange-400', dot: 'bg-orange-500', border: 'border-orange-100 dark:border-orange-500/20' },
-        Critical: { bg: 'bg-rose-50 dark:bg-rose-900/10', text: 'text-rose-600 dark:text-rose-400', dot: 'bg-rose-500', border: 'border-rose-100 dark:border-rose-500/20' },
+        Low: { bg: 'bg-emerald-50 ', text: 'text-emerald-600 ', dot: 'bg-emerald-500', border: 'border-emerald-100 ' },
+        Medium: { bg: 'bg-amber-50 ', text: 'text-amber-600 ', dot: 'bg-amber-500', border: 'border-amber-100 ' },
+        High: { bg: 'bg-orange-50 ', text: 'text-orange-600 ', dot: 'bg-orange-500', border: 'border-orange-100 ' },
+        Critical: { bg: 'bg-rose-50 ', text: 'text-rose-600 ', dot: 'bg-rose-500', border: 'border-rose-100 ' },
     };
 
     const config = priorityConfig[ticket.priority] || priorityConfig.Medium;
@@ -37,11 +37,8 @@ const KanbanCard = ({ ticket, onClick }) => {
             {...listeners}
             onClick={() => onClick(ticket)}
             whileHover={{ y: -4, scale: 1.01, transition: { duration: 0.2 } }}
-            className={`
-                bg-white dark:bg-slate-800 p-6 rounded-[2rem] border border-slate-200 dark:border-slate-700
-                cursor-grab active:cursor-grabbing group select-none shadow-sm
-                ${isDragging ? 'shadow-2xl ring-2 ring-blue-500/50 z-50' : 'hover:shadow-lg'}
-            `}
+            className={`group relative bg-white border border-slate-100 rounded-[2rem] p-6 cursor-grab active:cursor-grabbing transition-all hover:border-blue-500/50 hover:shadow-xl shadow-sm ${isDragging ? 'opacity-50 ring-2 ring-blue-500/20' : 'opacity-100'
+                }`}
         >
             <div className="flex justify-between items-center mb-5">
                 <div className={`px-3 py-1.5 rounded-xl text-[10px] font-black tracking-widest flex items-center gap-2 border ${config.bg} ${config.text} ${config.border}`}>
@@ -53,31 +50,38 @@ const KanbanCard = ({ ticket, onClick }) => {
                 </div>
             </div>
 
-            <h4 className="text-[15px] font-bold text-slate-800 dark:text-slate-100 mb-5 line-clamp-2 leading-relaxed tracking-tight group-hover:text-blue-600 transition-colors">
+            <h4 className="font-black text-slate-800 group-hover:text-blue-600 transition-colors text-sm line-clamp-2 leading-tight mb-4">
                 {ticket.title}
             </h4>
 
-            <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-50 dark:border-slate-700/50">
+            <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-50">
                 <div className="flex -space-x-3">
                     {ticket.assignees && ticket.assignees.length > 0 ? (
-                        ticket.assignees.map((assignee, i) => (
-                            <div
-                                key={assignee._id || i}
-                                className="w-8 h-8 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 border-2 border-white dark:border-slate-800 flex items-center justify-center text-[10px] text-white font-black shadow-md ring-1 ring-slate-100 dark:ring-slate-900"
-                                title={assignee.name || 'Unknown'}
-                            >
-                                {assignee.name ? assignee.name.charAt(0) : '?'}
-                            </div>
-                        ))
+                        <>
+                            {ticket.assignees.slice(0, 3).map((assignee, index) => (
+                                <div
+                                    key={assignee._id || index}
+                                    className="relative inline-block h-8 w-8 rounded-full ring-2 ring-white bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-[10px] font-black text-blue-700 shadow-sm"
+                                    title={assignee.name || 'Unknown'}
+                                >
+                                    {assignee.name ? assignee.name.charAt(0) : '?'}
+                                </div>
+                            ))}
+                            {ticket.assignees.length > 3 && (
+                                <div className="relative inline-block h-8 w-8 rounded-full ring-2 ring-white bg-slate-100 flex items-center justify-center text-[10px] font-black text-slate-500 shadow-sm">
+                                    +{ticket.assignees.length - 3}
+                                </div>
+                            )}
+                        </>
                     ) : (
-                        <div className="w-8 h-8 rounded-2xl bg-slate-100 dark:bg-slate-700 border-2 border-white dark:border-slate-800 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-2xl bg-slate-100 border-2 border-white flex items-center justify-center">
                             <IoPerson className="text-slate-400 text-xs" />
                         </div>
                     )}
                 </div>
 
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700 rounded-xl text-[10px] font-black text-slate-500 tracking-widest">
-                    <IoTimeOutline size={14} className="text-blue-600 dark:text-blue-500" />
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-black text-slate-500 tracking-widest">
+                    <IoTimeOutline size={14} className="text-blue-600" />
                     <span>{new Date(ticket.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
                 </div>
             </div>

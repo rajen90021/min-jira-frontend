@@ -85,17 +85,17 @@ const CreateDeveloperDrawer = ({ open, onClose, userToEdit }) => {
                 }
             }}
         >
-            <div className="h-full flex flex-col bg-white dark:bg-slate-950 shadow-2xl border-l border-slate-200 dark:border-slate-800 overflow-hidden">
-                <div className="px-8 py-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900/50">
+            <div className="h-full flex flex-col bg-white  shadow-2xl border-l border-slate-200  overflow-hidden">
+                <div className="px-8 py-8 border-b border-slate-100  flex items-center justify-between bg-slate-50 ">
                     <div>
-                        <h2 className="text-2xl font-black text-slate-900 dark:text-white leading-tight">
+                        <h2 className="text-2xl font-black text-slate-900  leading-tight">
                             {isEditMode ? 'Modify Entity' : 'New Entity'}
                         </h2>
                         <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Personnel registry and access</p>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-400 hover:text-rose-500 transition-all"
+                        className="p-2 bg-white  border border-slate-200  rounded-xl text-slate-400 hover:text-rose-500 transition-all"
                     >
                         <IoClose size={24} />
                     </button>
@@ -103,7 +103,7 @@ const CreateDeveloperDrawer = ({ open, onClose, userToEdit }) => {
 
                 <div className="relative flex-1 px-8 py-8 overflow-y-auto scrollbar-hide">
                     {isError && (
-                        <div className="mb-6 p-4 bg-rose-50 dark:bg-rose-500/10 border border-rose-100 dark:border-rose-500/20 rounded-2xl text-rose-600 dark:text-rose-500 text-sm font-bold flex items-center gap-3">
+                        <div className="mb-6 p-4 bg-rose-50  border border-rose-100  rounded-2xl text-rose-600  text-sm font-bold flex items-center gap-3">
                             <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
                             {message}
                         </div>
@@ -119,14 +119,14 @@ const CreateDeveloperDrawer = ({ open, onClose, userToEdit }) => {
                                 value={formData.name}
                                 onChange={handleChange}
                                 required
-                                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold placeholder:text-slate-400 transition-all"
+                                className="w-full bg-slate-50  border border-slate-200  rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800  font-bold placeholder:text-slate-400 transition-all"
                                 placeholder="Full name of target..."
                             />
                         </div>
 
                         <div className="space-y-2">
                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
-                                Neural Signal (Email)
+                                System Signal (Email)
                             </label>
                             <input
                                 name="email"
@@ -134,7 +134,7 @@ const CreateDeveloperDrawer = ({ open, onClose, userToEdit }) => {
                                 value={formData.email}
                                 onChange={handleChange}
                                 required
-                                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold placeholder:text-slate-400 transition-all"
+                                className="w-full bg-slate-50  border border-slate-200  rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800  font-bold placeholder:text-slate-400 transition-all"
                                 placeholder="primary@signal.corp"
                             />
                         </div>
@@ -149,7 +149,7 @@ const CreateDeveloperDrawer = ({ open, onClose, userToEdit }) => {
                                 value={formData.password}
                                 onChange={handleChange}
                                 required={!isEditMode}
-                                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold placeholder:text-slate-400 transition-all"
+                                className="w-full bg-slate-50  border border-slate-200  rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800  font-bold placeholder:text-slate-400 transition-all"
                                 placeholder={isEditMode ? "Leave blank to maintain key" : "••••••••"}
                             />
                         </div>
@@ -162,10 +162,10 @@ const CreateDeveloperDrawer = ({ open, onClose, userToEdit }) => {
                                 name="role"
                                 value={formData.role}
                                 onChange={handleChange}
-                                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold appearance-none transition-all"
+                                className="w-full bg-slate-50  border border-slate-200  rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800  font-bold appearance-none transition-all"
                             >
-                                <option value={USER_ROLES.DEVELOPER} className="dark:bg-slate-900">Developer (Standard)</option>
-                                <option value={USER_ROLES.MANAGER} className="dark:bg-slate-900">Manager (Admin)</option>
+                                <option value={USER_ROLES.DEVELOPER} className="">Developer (Standard)</option>
+                                <option value={USER_ROLES.MANAGER} className="">Manager (Admin)</option>
                             </select>
                         </div>
 
@@ -182,7 +182,7 @@ const CreateDeveloperDrawer = ({ open, onClose, userToEdit }) => {
                             <button
                                 type="button"
                                 onClick={onClose}
-                                className="w-full py-4 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-black text-[10px] uppercase tracking-[0.2em] hover:bg-slate-200 dark:hover:bg-slate-800 rounded-2xl transition-all"
+                                className="w-full py-4 bg-slate-100  border border-slate-200  text-slate-500  font-black text-[10px] uppercase tracking-[0.2em] hover:bg-slate-200 :bg-slate-800 rounded-2xl transition-all"
                             >
                                 Abort
                             </button>

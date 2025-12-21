@@ -12,11 +12,11 @@ const EmptyState = ({
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3 }}
-            className={`flex flex-col items-center justify-center p-8 text-center min-h-[300px] bg-gray-50 dark:bg-gray-900/50 rounded-xl border-2 dashed border-gray-200 dark:border-gray-800 ${className}`}
+            className={`flex flex-col items-center justify-center p-8 text-center min-h-[300px] bg-gray-50  rounded-xl border-2 dashed border-gray-200  ${className}`}
         >
-            <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4 shadow-inner">
+            <div className="w-16 h-16 rounded-full bg-gray-100  flex items-center justify-center mb-4 shadow-inner">
                 {icon ? (
-                    <div className="text-gray-400 dark:text-gray-500 text-3xl">
+                    <div className="text-gray-400  text-3xl">
                         {icon}
                     </div>
                 ) : (
@@ -36,10 +36,10 @@ const EmptyState = ({
                     </svg>
                 )}
             </div>
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">
+            <h3 className="text-lg font-medium text-gray-900  mb-1">
                 {title}
             </h3>
-            <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto mb-6">
+            <p className="text-gray-500  max-w-sm mx-auto mb-6">
                 {description}
             </p>
             {action && (

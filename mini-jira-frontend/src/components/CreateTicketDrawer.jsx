@@ -180,7 +180,7 @@ export default function CreateTicketDrawer({ open, onClose, ticketToEdit }) {
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
                 >
-                    <div className="fixed inset-0 bg-slate-900/60 transition-opacity" />
+                    <div className="fixed inset-0 bg-slate-50 transition-opacity" />
                 </Transition.Child>
 
                 <div className="fixed inset-0 overflow-hidden">
@@ -196,22 +196,22 @@ export default function CreateTicketDrawer({ open, onClose, ticketToEdit }) {
                                 leaveTo="translate-x-full"
                             >
                                 <Dialog.Panel className="pointer-events-auto w-screen max-w-lg">
-                                    <div className="flex h-full flex-col bg-white dark:bg-slate-950 shadow-2xl overflow-hidden border-l border-slate-200 dark:border-slate-800">
-                                        <div className="px-8 py-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900/50">
+                                    <div className="flex h-full flex-col bg-white  shadow-2xl overflow-hidden border-l border-slate-200 ">
+                                        <div className="px-8 py-8 border-b border-slate-100  flex items-center justify-between bg-slate-50 ">
                                             <div>
-                                                <Dialog.Title className="text-2xl font-black text-slate-900 dark:text-white leading-tight">
-                                                    {isEditMode ? 'Edit Neural Node' : 'Draft New Ticket'}
+                                                <Dialog.Title className="text-2xl font-black text-slate-900  leading-tight">
+                                                    {isEditMode ? 'Edit System Node' : 'Draft New Ticket'}
                                                 </Dialog.Title>
                                                 <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Classification and assignment</p>
                                             </div>
-                                            <button onClick={onClose} className="p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-400 hover:text-rose-500 transition-all">
+                                            <button onClick={onClose} className="p-2 bg-white  border border-slate-200  rounded-xl text-slate-400 hover:text-rose-500 transition-all">
                                                 <IoClose size={24} />
                                             </button>
                                         </div>
 
                                         <div className="relative flex-1 px-8 py-8 overflow-y-auto scrollbar-hide">
                                             {isError && (
-                                                <div className="mb-4 p-3 bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 rounded-lg text-red-600 dark:text-red-500 text-sm font-bold">
+                                                <div className="mb-4 p-3 bg-red-50  border border-red-100  rounded-lg text-red-600  text-sm font-bold">
                                                     {message}
                                                 </div>
                                             )}
@@ -226,11 +226,11 @@ export default function CreateTicketDrawer({ open, onClose, ticketToEdit }) {
                                                         required
                                                         value={formData.projectId}
                                                         onChange={handleChange}
-                                                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold appearance-none transition-all"
+                                                        className="w-full bg-slate-50  border border-slate-200  rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800  font-bold appearance-none transition-all"
                                                     >
-                                                        <option value="" className="dark:bg-slate-900">Select Project Hub...</option>
+                                                        <option value="" className="">Select Project Hub...</option>
                                                         {projectOptions.map((p) => (
-                                                            <option key={p._id} value={p._id} className="dark:bg-slate-900">{p.name}</option>
+                                                            <option key={p._id} value={p._id} className="">{p.name}</option>
                                                         ))}
                                                     </select>
                                                 </div>
@@ -245,7 +245,7 @@ export default function CreateTicketDrawer({ open, onClose, ticketToEdit }) {
                                                         required
                                                         value={formData.title}
                                                         onChange={handleChange}
-                                                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold placeholder:text-slate-400 transition-all"
+                                                        className="w-full bg-slate-50  border border-slate-200  rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800  font-bold placeholder:text-slate-400 transition-all"
                                                         placeholder="What needs to be built?"
                                                     />
                                                     <SmartSuggestions
@@ -265,10 +265,10 @@ export default function CreateTicketDrawer({ open, onClose, ticketToEdit }) {
                                                             name="status"
                                                             value={formData.status}
                                                             onChange={handleChange}
-                                                            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold appearance-none transition-all"
+                                                            className="w-full bg-slate-50  border border-slate-200  rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800  font-bold appearance-none transition-all"
                                                         >
                                                             {Object.values(TICKET_STATUS).map((s) => (
-                                                                <option key={s} value={s} className="dark:bg-slate-900">{s}</option>
+                                                                <option key={s} value={s} className="">{s}</option>
                                                             ))}
                                                         </select>
                                                     </div>
@@ -280,10 +280,10 @@ export default function CreateTicketDrawer({ open, onClose, ticketToEdit }) {
                                                             name="priority"
                                                             value={formData.priority}
                                                             onChange={handleChange}
-                                                            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold appearance-none transition-all"
+                                                            className="w-full bg-slate-50  border border-slate-200  rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800  font-bold appearance-none transition-all"
                                                         >
                                                             {Object.values(TICKET_PRIORITY).map((p) => (
-                                                                <option key={p} value={p} className="dark:bg-slate-900">{p}</option>
+                                                                <option key={p} value={p} className="">{p}</option>
                                                             ))}
                                                         </select>
                                                     </div>
@@ -291,7 +291,7 @@ export default function CreateTicketDrawer({ open, onClose, ticketToEdit }) {
 
                                                 <div className="space-y-2">
                                                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
-                                                        Assigned Neural Nodes
+                                                        Assigned System Nodes
                                                     </label>
                                                     <Listbox
                                                         value={formData.assignees}
@@ -299,7 +299,7 @@ export default function CreateTicketDrawer({ open, onClose, ticketToEdit }) {
                                                         multiple
                                                     >
                                                         <div className="relative">
-                                                            <Listbox.Button className="relative w-full cursor-default rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 py-3.5 pl-5 pr-12 text-left outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold min-h-[50px] transition-all">
+                                                            <Listbox.Button className="relative w-full cursor-default rounded-2xl bg-slate-50  border border-slate-200  py-3.5 pl-5 pr-12 text-left outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800  font-bold min-h-[50px] transition-all">
                                                                 <span className="block truncate">
                                                                     {formData.assignees.length === 0
                                                                         ? 'Connect Developers...'
@@ -318,12 +318,12 @@ export default function CreateTicketDrawer({ open, onClose, ticketToEdit }) {
                                                                 leaveFrom="opacity-100"
                                                                 leaveTo="opacity-0"
                                                             >
-                                                                <Listbox.Options className="absolute mt-2 max-h-60 w-full overflow-auto rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 py-2 text-base shadow-2xl ring-1 ring-black/5 outline-none sm:text-sm z-50">
+                                                                <Listbox.Options className="absolute mt-2 max-h-60 w-full overflow-auto rounded-2xl bg-white  border border-slate-200  py-2 text-base shadow-2xl ring-1 ring-black/5 outline-none sm:text-sm z-50">
                                                                     {userOptions.map((user) => (
                                                                         <Listbox.Option
                                                                             key={user._id}
                                                                             className={({ active }) =>
-                                                                                `relative cursor-default select-none py-3 pl-12 pr-4 transition-colors ${active ? 'bg-blue-600 text-white' : 'text-slate-800 dark:text-slate-100'
+                                                                                `relative cursor-default select-none py-3 pl-12 pr-4 transition-colors ${active ? 'bg-blue-600 text-white' : 'text-slate-800 '
                                                                                 }`
                                                                             }
                                                                             value={user._id}
@@ -361,7 +361,7 @@ export default function CreateTicketDrawer({ open, onClose, ticketToEdit }) {
                                                             disabled={!formData.description.trim() || isRefining}
                                                             className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-tighter transition-all ${isRefining
                                                                 ? 'bg-blue-600 text-white animate-pulse'
-                                                                : 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-500/20'
+                                                                : 'bg-indigo-50  text-indigo-600  border border-indigo-100 '
                                                                 } disabled:opacity-30 disabled:cursor-not-allowed`}
                                                         >
                                                             {isRefining ? 'Re-coding...' : (
@@ -377,7 +377,7 @@ export default function CreateTicketDrawer({ open, onClose, ticketToEdit }) {
                                                         value={formData.description}
                                                         onChange={handleChange}
                                                         rows={5}
-                                                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold resize-none placeholder:text-slate-400 transition-all"
+                                                        className="w-full bg-slate-50  border border-slate-200  rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800  font-bold resize-none placeholder:text-slate-400 transition-all"
                                                         placeholder="Technical description of the requirement..."
                                                     />
                                                 </div>
@@ -385,14 +385,14 @@ export default function CreateTicketDrawer({ open, onClose, ticketToEdit }) {
                                                 <div className="grid grid-cols-2 gap-4">
                                                     <div className="space-y-2">
                                                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
-                                                            Neural Hours
+                                                            System Hours
                                                         </label>
                                                         <input
                                                             type="number"
                                                             name="spendTime"
                                                             value={formData.spendTime}
                                                             onChange={handleChange}
-                                                            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold appearance-none transition-all"
+                                                            className="w-full bg-slate-50  border border-slate-200  rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800  font-bold appearance-none transition-all"
                                                         />
                                                     </div>
                                                     <div className="space-y-2">
@@ -404,7 +404,7 @@ export default function CreateTicketDrawer({ open, onClose, ticketToEdit }) {
                                                             name="duration"
                                                             value={formData.duration}
                                                             onChange={handleChange}
-                                                            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold appearance-none transition-all"
+                                                            className="w-full bg-slate-50  border border-slate-200  rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800  font-bold appearance-none transition-all"
                                                         />
                                                     </div>
                                                 </div>
@@ -418,7 +418,7 @@ export default function CreateTicketDrawer({ open, onClose, ticketToEdit }) {
                                                         name="remark"
                                                         value={formData.remark}
                                                         onChange={handleChange}
-                                                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold placeholder:text-slate-400 transition-all"
+                                                        className="w-full bg-slate-50  border border-slate-200  rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800  font-bold placeholder:text-slate-400 transition-all"
                                                         placeholder="Internal system notes..."
                                                     />
                                                 </div>
@@ -427,7 +427,7 @@ export default function CreateTicketDrawer({ open, onClose, ticketToEdit }) {
                                                     <button
                                                         type="button"
                                                         onClick={onClose}
-                                                        className="flex-1 px-6 py-4 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-800 transition-all font-black text-[10px] uppercase tracking-widest"
+                                                        className="flex-1 px-6 py-4 bg-slate-100  border border-slate-200  text-slate-500  rounded-2xl hover:bg-slate-200 :bg-slate-800 transition-all font-black text-[10px] uppercase tracking-widest"
                                                     >
                                                         Abort
                                                     </button>
@@ -437,7 +437,7 @@ export default function CreateTicketDrawer({ open, onClose, ticketToEdit }) {
                                                         loadingText={isEditMode ? 'Syncing...' : 'Deploying...'}
                                                         className="flex-1 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl shadow-lg shadow-blue-500/10 font-black text-[10px] uppercase tracking-widest transition-all"
                                                     >
-                                                        {isEditMode ? 'Update Neural Node' : 'Initialize Ticket'}
+                                                        {isEditMode ? 'Update System Node' : 'Initialize Ticket'}
                                                     </LoadingButton>
                                                 </div>
                                             </form>

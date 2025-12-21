@@ -42,7 +42,7 @@ export default function Login() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800 p-4">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100   p-4">
             <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
@@ -60,7 +60,7 @@ export default function Login() {
                         <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent mb-2">
                             Xetabots
                         </h1>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm font-medium">
+                        <p className="text-gray-600  text-sm font-medium">
                             Project Management System
                         </p>
                     </motion.div>
@@ -71,12 +71,12 @@ export default function Login() {
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.1, duration: 0.5 }}
-                    className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-8"
+                    className="bg-white  rounded-2xl shadow-xl border border-gray-200  p-8"
                 >
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                    <h2 className="text-2xl font-bold text-gray-900  mb-2">
                         Welcome Back
                     </h2>
-                    <p className="text-gray-600 dark:text-gray-400 mb-6">
+                    <p className="text-gray-600  mb-6">
                         Sign in to your account to continue
                     </p>
 
@@ -84,7 +84,7 @@ export default function Login() {
                         <motion.div
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg mb-6 text-sm"
+                            className="bg-red-50  border border-red-200  text-red-700  px-4 py-3 rounded-lg mb-6 text-sm"
                         >
                             {message}
                         </motion.div>
@@ -94,7 +94,7 @@ export default function Login() {
                         {/* Email Field */}
                         <div>
                             <label
-                                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                                className="block text-sm font-medium text-gray-700  mb-2"
                                 htmlFor="email"
                             >
                                 Email Address
@@ -106,14 +106,14 @@ export default function Login() {
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
                                 placeholder="you@example.com"
-                                className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                                className="w-full px-4 py-3 rounded-lg border border-gray-300  bg-white  text-gray-900  placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                             />
                         </div>
 
                         {/* Password Field */}
                         <div>
                             <label
-                                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                                className="block text-sm font-medium text-gray-700  mb-2"
                                 htmlFor="password"
                             >
                                 Password
@@ -125,7 +125,7 @@ export default function Login() {
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
                                 placeholder="••••••••"
-                                className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                                className="w-full px-4 py-3 rounded-lg border border-gray-300  bg-white  text-gray-900  placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                             />
                         </div>
 
@@ -159,7 +159,7 @@ export default function Login() {
                     transition={{ delay: 0.3 }}
                     className="text-center mt-6"
                 >
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-gray-600 ">
                         © 2025 Xetabots. All rights reserved.
                     </p>
                 </motion.div>

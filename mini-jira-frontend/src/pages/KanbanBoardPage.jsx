@@ -194,7 +194,7 @@ const KanbanBoardPage = () => {
                     <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
                         Predictive Flow
                     </h1>
-                    <p className="text-gray-500 dark:text-neutral-400 font-medium">Drag and drop tickets through the neural workflow.</p>
+                    <p className="text-gray-500 font-medium">Drag and drop tickets through the workflow.</p>
                 </div>
             </motion.div>
 

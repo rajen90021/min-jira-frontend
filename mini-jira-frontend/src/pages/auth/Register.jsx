@@ -18,7 +18,7 @@ export default function Register() {
                 initial={{ scale: 0.85, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
-                className="relative bg-white/5 backdrop-blur-lg border border-white/20 rounded-2xl p-10 w-full max-w-md shadow-xl overflow-hidden"
+                className="relative bg-white  border border-white/20 rounded-2xl p-10 w-full max-w-md shadow-xl overflow-hidden"
             >
                 {/* Glowing circle */}
                 <motion.div
@@ -49,7 +49,7 @@ export default function Register() {
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             required
-                            className="w-full rounded-lg bg-white/10 backdrop-blur-sm border border-white/30 focus:border-[#ff9cff] focus:ring-1 focus:ring-[#ff9cff] text-gray-200 px-4 py-3 outline-none"
+                            className="w-full rounded-lg bg-white  border border-white/30 focus:border-[#ff9cff] focus:ring-1 focus:ring-[#ff9cff] text-gray-200 px-4 py-3 outline-none"
                         />
                     </div>
 
@@ -64,7 +64,7 @@ export default function Register() {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
-                            className="w-full rounded-lg bg-white/10 backdrop-blur-sm border border-white/30 focus:border-[#ff9cff] focus:ring-1 focus:ring-[#ff9cff] text-gray-200 px-4 py-3 outline-none"
+                            className="w-full rounded-lg bg-white  border border-white/30 focus:border-[#ff9cff] focus:ring-1 focus:ring-[#ff9cff] text-gray-200 px-4 py-3 outline-none"
                         />
                     </div>
 
@@ -79,7 +79,7 @@ export default function Register() {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
-                            className="w-full rounded-lg bg-white/10 backdrop-blur-sm border border-white/30 focus:border-[#ff9cff] focus:ring-1 focus:ring-[#ff9cff] text-gray-200 px-4 py-3 outline-none"
+                            className="w-full rounded-lg bg-white  border border-white/30 focus:border-[#ff9cff] focus:ring-1 focus:ring-[#ff9cff] text-gray-200 px-4 py-3 outline-none"
                         />
                     </div>
 

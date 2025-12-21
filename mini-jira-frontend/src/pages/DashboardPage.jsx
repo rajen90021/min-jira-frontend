@@ -10,10 +10,10 @@ import StatusBadge from '../components/StatusBadge';
 import { format } from 'date-fns';
 import { Link, useNavigate } from 'react-router-dom';
 
-const MatrixBackground = () => (
+const CoreBackground = () => (
     <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.03]">
         <div className="absolute inset-0" style={{
-            backgroundImage: `radial-gradient(circle at 1.5px 1.5px, currentColor 1px, transparent 0)`,
+            backgroundImage: `radial-gradient(circle at 1.5px 1.5px, #64748b 1px, transparent 0)`,
             backgroundSize: '48px 48px'
         }} />
     </div>
@@ -27,7 +27,7 @@ const StatCard = ({ title, value, icon: Icon, colorClass, trend, delay = 0, to }
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay, duration: 0.4 }}
             onClick={() => to && navigate(to)}
-            className="group relative p-8 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 cursor-pointer hover:border-blue-500/50 hover:shadow-xl transition-all duration-300 overflow-hidden"
+            className="group relative p-8 bg-white rounded-3xl border border-slate-100 cursor-pointer hover:border-blue-500/50 hover:shadow-xl transition-all duration-300 overflow-hidden"
         >
             <div className={`absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity`}>
                 <Icon size={80} />
@@ -35,11 +35,11 @@ const StatCard = ({ title, value, icon: Icon, colorClass, trend, delay = 0, to }
 
             <div className="flex items-start justify-between relative z-10">
                 <div>
-                    <h4 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-3">
+                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">
                         {title}
                     </h4>
                     <div className="flex items-baseline gap-2">
-                        <span className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">
+                        <span className="text-4xl font-black text-slate-900 tracking-tighter">
                             {value}
                         </span>
                         {trend && (
@@ -105,8 +105,8 @@ const DashboardPage = () => {
     const recentTickets = tickets?.slice(0, 5) || [];
 
     return (
-        <div className="h-full relative flex flex-col p-8 bg-white dark:bg-slate-950 transition-colors duration-500 overflow-hidden">
-            <MatrixBackground />
+        <div className="h-full relative flex flex-col p-8 bg-white transition-colors duration-500 overflow-hidden">
+            <CoreBackground />
 
             {/* Header Hub */}
             <div className="flex-shrink-0 relative z-10 mb-8 flex justify-between items-end">
@@ -124,7 +124,7 @@ const DashboardPage = () => {
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="text-4xl font-black text-slate-900 dark:text-white tracking-tight"
+                        className="text-4xl font-black text-slate-900 tracking-tight"
                     >
                         Welcome, <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent italic uppercase">{user?.name?.split(' ')[0]}</span>
                     </motion.h1>
@@ -132,7 +132,7 @@ const DashboardPage = () => {
                 <div className="hidden md:flex items-center gap-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">
                     <div className="flex flex-col items-end">
                         <span className="text-blue-500">System Capacity</span>
-                        <span className="text-xl text-slate-900 dark:text-white tracking-tighter">{tickets?.length} Active Items</span>
+                        <span className="text-xl text-slate-900 tracking-tighter">{tickets?.length} Active Items</span>
                     </div>
                 </div>
             </div>
@@ -179,15 +179,15 @@ const DashboardPage = () => {
                     {/* Activity Section */}
                     <div className="xl:col-span-2 space-y-4">
                         <div className="flex items-center justify-between mb-2">
-                            <h2 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tighter flex items-center gap-3">
+                            <h2 className="text-lg font-black text-slate-900 uppercase tracking-tighter flex items-center gap-3">
                                 <IoTerminalOutline className="text-blue-600" />
                                 Recent Activity Stream
                             </h2>
                             <Link to="/app/timeline" className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] hover:opacity-70 transition-opacity">View All history</Link>
                         </div>
 
-                        <div className="bg-white dark:bg-slate-900 rounded-[32px] border border-slate-100 dark:border-slate-800 overflow-hidden shadow-sm">
-                            <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                        <div className="bg-white rounded-[32px] border border-slate-100 overflow-hidden shadow-sm">
+                            <div className="divide-y divide-slate-100 ">
                                 {ticketsLoading ? (
                                     <div className="p-10 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest animate-pulse">Syncing Data Store...</div>
                                 ) : recentTickets.length === 0 ? (
@@ -197,22 +197,22 @@ const DashboardPage = () => {
                                         <div
                                             key={ticket._id}
                                             onClick={() => navigate('/app/tickets')}
-                                            className="p-6 hover:bg-white dark:hover:bg-white/5 cursor-pointer transition-all group"
+                                            className="p-6 hover:bg-slate-50 cursor-pointer transition-all group"
                                         >
                                             <div className="flex items-center justify-between gap-4">
                                                 <div className="flex items-center gap-4 min-w-0">
-                                                    <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-500 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm">
+                                                    <div className="w-10 h-10 rounded-xl bg-slate-100  flex items-center justify-center text-slate-400  group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm">
                                                         <IoTicket size={20} />
                                                     </div>
                                                     <div className="min-w-0">
-                                                        <h3 className="font-bold text-slate-900 dark:text-white truncate group-hover:text-blue-600 transition-colors text-sm">{ticket.title}</h3>
+                                                        <h3 className="font-bold text-slate-900 truncate group-hover:text-blue-600 transition-colors text-sm">{ticket.title}</h3>
                                                         <div className="flex items-center gap-3 mt-1">
                                                             <StatusBadge status={ticket.status} type="ticket" />
-                                                            <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">{ticket.priority} Priority</span>
+                                                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{ticket.priority} Priority</span>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+                                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                                                     {ticket.createdAt ? format(new Date(ticket.createdAt), 'MMM dd') : '-'}
                                                 </span>
                                             </div>
@@ -225,8 +225,8 @@ const DashboardPage = () => {
 
                     {/* Sidebar Hub */}
                     <div className="space-y-6">
-                        <div className="bg-white dark:bg-slate-900 rounded-[32px] p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
-                            <h2 className="text-[10px] font-black text-slate-900 dark:text-white mb-6 uppercase tracking-[0.3em]">Sector Monitoring</h2>
+                        <div className="bg-white rounded-[32px] p-8 border border-slate-100 shadow-sm">
+                            <h2 className="text-[10px] font-black text-slate-900 mb-6 uppercase tracking-[0.3em]">Sector Monitoring</h2>
                             <div className="space-y-4">
                                 {[
                                     { label: 'Project Hubs', value: projects?.length || 0, icon: IoBriefcase, color: 'text-blue-600', to: '/app/projects' },
@@ -236,13 +236,13 @@ const DashboardPage = () => {
                                     <div
                                         key={i}
                                         onClick={() => navigate(item.to)}
-                                        className="flex items-center justify-between p-5 bg-white dark:bg-slate-800/40 rounded-2xl border border-slate-100 dark:border-slate-800 cursor-pointer hover:border-blue-500/30 group transition-all"
+                                        className="flex items-center justify-between p-5 bg-white rounded-2xl border border-slate-100 cursor-pointer hover:border-blue-500/30 group transition-all"
                                     >
                                         <div className="flex items-center gap-3">
                                             <item.icon size={18} className={`${item.color} group-hover:scale-110 transition-transform`} />
-                                            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">{item.label}</span>
+                                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{item.label}</span>
                                         </div>
-                                        <span className="text-xl font-black text-slate-900 dark:text-white tracking-tighter">{item.value}</span>
+                                        <span className="text-xl font-black text-slate-900 tracking-tighter">{item.value}</span>
                                     </div>
                                 ))}
                             </div>
@@ -262,7 +262,7 @@ const DashboardPage = () => {
                                     Personnel Registry
                                 </button>
                             </div>
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl" />
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full -mr-16 -mt-16 blur-2xl" />
                         </div>
                     </div>
                 </div>

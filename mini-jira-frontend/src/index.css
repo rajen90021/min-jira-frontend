@@ -1,19 +1,13 @@
 @import "tailwindcss";
 
-@variant dark (&:where(.dark, .dark *));
-
 @theme {
   --color-primary: #3b82f6;
   --color-secondary: #64748b;
 
-  /* Professional Theme Colors */
   --color-pane-bg: #ffffff;
-  --color-pane-bg-dark: #1e293b;
   --color-pane-border: #f1f5f9;
-  --color-pane-border-dark: #334155;
 
   --shadow-premium: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-premium-dark: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
 @layer base {
@@ -26,23 +20,15 @@
   }
 
   body {
-    @apply bg-white text-slate-900 transition-colors duration-500;
-  }
-
-  .dark body {
-    @apply bg-slate-950 text-slate-100;
+    @apply bg-white text-slate-900;
   }
 }
 
 @layer components {
 
-  /* Solid Card System */
+  /* Solid Card System - Pure Light */
   .glass-card {
     @apply bg-white border border-slate-100 shadow-sm transition-all duration-300;
-  }
-
-  .dark .glass-card {
-    @apply bg-slate-900 border-slate-800 shadow-md;
   }
 
   /* Solid Sidebar System */
@@ -50,17 +36,9 @@
     @apply bg-white border-r border-slate-100 shadow-sm;
   }
 
-  .dark .glass-sidebar {
-    @apply bg-slate-950 border-r border-slate-800;
-  }
-
   /* Static Solid Backgrounds - No Gradients */
   .bg-mesh {
     @apply relative overflow-hidden bg-white transition-colors duration-700;
-  }
-
-  .dark .bg-mesh {
-    @apply bg-slate-950;
   }
 
   /* Premium Buttons - Solid */
@@ -78,10 +56,10 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-slate-200 dark:bg-slate-800 rounded-full;
+    @apply bg-slate-200 rounded-full;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-slate-300 dark:bg-slate-700;
+    @apply bg-slate-300;
   }
 }

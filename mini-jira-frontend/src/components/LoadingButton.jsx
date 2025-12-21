@@ -14,9 +14,9 @@ const LoadingButton = ({
 
     const variants = {
         primary: "bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 focus:ring-blue-500",
-        secondary: "bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white focus:ring-gray-500",
+        secondary: "bg-gray-100  hover:bg-gray-200 :bg-gray-700 text-gray-900  focus:ring-gray-500",
         danger: "bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-500/20 focus:ring-red-500",
-        outline: "border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#252526] focus:ring-gray-500"
+        outline: "border border-gray-200  text-gray-700  hover:bg-gray-50 :bg-[#252526] focus:ring-gray-500"
     };
 
     return (

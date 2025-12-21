@@ -30,7 +30,6 @@ import MenuItem from '@mui/material/MenuItem';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../store/slices/authSlice';
-import ThemeToggle from '../components/ThemeToggle';
 import AICopilotSidebar from '../components/AICopilotSidebar';
 import { IoSparkles } from 'react-icons/io5';
 import { motion } from 'framer-motion';
@@ -55,7 +54,7 @@ const closedMixin = (theme) => ({
         duration: theme.transitions.duration.leavingScreen,
     }),
     overflowX: 'hidden',
-    backgroundColor: theme.palette.mode === 'light' ? '#ffffff' : '#020617',
+    backgroundColor: '#ffffff',
     borderRight: `1px solid ${theme.palette.divider}`,
     width: `calc(${theme.spacing(7)} + 1px)`,
     [theme.breakpoints.up('sm')]: {
@@ -151,23 +150,19 @@ const DrawerMenu = ({ items, open }) => (
 );
 
 export default function MiniDrawer() {
-    const [mode, setMode] = React.useState(() => {
-        return localStorage.getItem('theme') || 'light';
-    });
-
     const muiTheme = React.useMemo(
         () =>
             createTheme({
                 palette: {
-                    mode,
+                    mode: 'light',
                     primary: {
                         main: '#3b82f6',
                     },
                     background: {
-                        default: mode === 'light' ? '#ffffff' : '#020617',
-                        paper: mode === 'light' ? '#ffffff' : '#0f172a',
+                        default: '#ffffff',
+                        paper: '#ffffff',
                     },
-                    divider: mode === 'light' ? '#f1f5f9' : '#1e293b',
+                    divider: '#f1f5f9',
                 },
                 components: {
                     MuiPaper: {
@@ -180,7 +175,7 @@ export default function MiniDrawer() {
                     MuiAppBar: {
                         styleOverrides: {
                             root: {
-                                color: mode === 'light' ? '#1e293b' : '#f1f5f9',
+                                color: '#1e293b',
                             }
                         }
                     },
@@ -190,7 +185,7 @@ export default function MiniDrawer() {
                                 borderRadius: '12px',
                                 margin: '4px 12px',
                                 '&.active': {
-                                    backgroundColor: mode === 'light' ? '#eff6ff' : '#1e293b',
+                                    backgroundColor: '#eff6ff',
                                     color: '#3b82f6',
                                     '& .MuiListItemIcon-root': {
                                         color: '#3b82f6',
@@ -204,24 +199,12 @@ export default function MiniDrawer() {
                     fontFamily: "'Inter', 'Outfit', sans-serif",
                 },
             }),
-        [mode]
+        []
     );
 
     React.useEffect(() => {
-        const isDark = document.documentElement.classList.contains('dark');
-        setMode(isDark ? 'dark' : 'light');
-
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                if (mutation.attributeName === 'class') {
-                    const isDarkNow = document.documentElement.classList.contains('dark');
-                    setMode(isDarkNow ? 'dark' : 'light');
-                }
-            });
-        });
-
-        observer.observe(document.documentElement, { attributes: true });
-        return () => observer.disconnect();
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
     }, []);
 
     const theme = useTheme();
@@ -309,7 +292,7 @@ export default function MiniDrawer() {
                             variant="caption"
                             sx={{
                                 fontWeight: 800,
-                                color: mode === 'light' ? '#64748b' : '#94a3b8',
+                                color: '#64748b',
                                 letterSpacing: '1px',
                                 textTransform: 'uppercase',
                                 fontSize: '0.6rem',
@@ -342,7 +325,7 @@ export default function MiniDrawer() {
                             gap: 1.5,
                             p: 1.5,
                             borderRadius: '16px',
-                            bgcolor: mode === 'light' ? '#f8fafc' : '#0f172a',
+                            bgcolor: '#f8fafc',
                             border: '1px solid',
                             borderColor: 'divider',
                         }}>
@@ -388,7 +371,7 @@ export default function MiniDrawer() {
 
     return (
         <ThemeProvider theme={muiTheme}>
-            <Box sx={{ display: 'flex' }} className="min-h-screen bg-slate-50 dark:bg-[#030712] transition-colors duration-500">
+            <Box sx={{ display: 'flex' }} className="min-h-screen bg-white transition-colors duration-500">
                 <CssBaseline />
                 <AppBar position="fixed" open={open} elevation={0}>
                     <Toolbar>
@@ -426,7 +409,7 @@ export default function MiniDrawer() {
                                 onClick={() => setIsCopilotOpen(!isCopilotOpen)}
                                 className={`p-2.5 rounded-xl transition-all ${isCopilotOpen
                                     ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
-                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
+                                    : 'bg-slate-100 text-slate-500 border border-slate-200'
                                     }`}
                                 title="Xetabots AI Assistant"
                             >
@@ -486,7 +469,7 @@ export default function MiniDrawer() {
                                         border: '1px solid',
                                         borderColor: 'divider',
                                         boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
-                                        bgcolor: mode === 'light' ? '#ffffff' : '#0f172a',
+                                        bgcolor: '#ffffff',
                                     }
                                 }
                             }}

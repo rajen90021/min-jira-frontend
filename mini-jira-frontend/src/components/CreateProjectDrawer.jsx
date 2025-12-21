@@ -113,7 +113,7 @@ export default function CreateProjectDrawer({ open, onClose, projectToEdit }) {
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
                 >
-                    <div className="fixed inset-0 bg-slate-900/60 transition-opacity" />
+                    <div className="fixed inset-0 bg-slate-50 transition-opacity" />
                 </Transition.Child>
 
                 <div className="fixed inset-0 overflow-hidden">
@@ -129,17 +129,17 @@ export default function CreateProjectDrawer({ open, onClose, projectToEdit }) {
                                 leaveTo="translate-x-full"
                             >
                                 <Dialog.Panel className="pointer-events-auto w-screen max-w-lg">
-                                    <div className="flex h-full flex-col bg-white dark:bg-slate-950 shadow-2xl overflow-hidden border-l border-slate-200 dark:border-slate-800">
-                                        <div className="px-8 py-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900/50">
+                                    <div className="flex h-full flex-col bg-white  shadow-2xl overflow-hidden border-l border-slate-200 ">
+                                        <div className="px-8 py-8 border-b border-slate-100  flex items-center justify-between bg-slate-50 ">
                                             <div>
-                                                <Dialog.Title className="text-2xl font-black text-slate-900 dark:text-white leading-tight">
+                                                <Dialog.Title className="text-2xl font-black text-slate-900  leading-tight">
                                                     {isEditMode ? 'Modify Initiative' : 'New Initiative'}
                                                 </Dialog.Title>
                                                 <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Project parameters and authority</p>
                                             </div>
                                             <button
                                                 onClick={onClose}
-                                                className="p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-400 hover:text-rose-500 transition-all"
+                                                className="p-2 bg-white  border border-slate-200  rounded-xl text-slate-400 hover:text-rose-500 transition-all"
                                             >
                                                 <IoClose size={24} />
                                             </button>
@@ -147,7 +147,7 @@ export default function CreateProjectDrawer({ open, onClose, projectToEdit }) {
 
                                         <div className="relative flex-1 px-8 py-8 overflow-y-auto scrollbar-hide">
                                             {isError && (
-                                                <div className="mb-4 p-3 bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 rounded-lg text-red-600 dark:text-red-500 text-sm font-bold">
+                                                <div className="mb-4 p-3 bg-red-50  border border-red-100  rounded-lg text-red-600  text-sm font-bold">
                                                     {message}
                                                 </div>
                                             )}
@@ -163,7 +163,7 @@ export default function CreateProjectDrawer({ open, onClose, projectToEdit }) {
                                                         required
                                                         value={formData.name}
                                                         onChange={handleChange}
-                                                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold placeholder:text-slate-400 transition-all"
+                                                        className="w-full bg-slate-50  border border-slate-200  rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800  font-bold placeholder:text-slate-400 transition-all"
                                                         placeholder="e.g. Phoenix Protocol"
                                                     />
                                                 </div>
@@ -177,11 +177,11 @@ export default function CreateProjectDrawer({ open, onClose, projectToEdit }) {
                                                         required
                                                         value={formData.managerId}
                                                         onChange={handleChange}
-                                                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold appearance-none transition-all"
+                                                        className="w-full bg-slate-50  border border-slate-200  rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800  font-bold appearance-none transition-all"
                                                     >
-                                                        <option value="" className="dark:bg-slate-900">Assign Authority...</option>
+                                                        <option value="" className="">Assign Authority...</option>
                                                         {managerOptions.map((manager) => (
-                                                            <option key={manager._id} value={manager._id} className="dark:bg-slate-900">
+                                                            <option key={manager._id} value={manager._id} className="">
                                                                 {manager.name}
                                                             </option>
                                                         ))}
@@ -196,10 +196,10 @@ export default function CreateProjectDrawer({ open, onClose, projectToEdit }) {
                                                         name="status"
                                                         value={formData.status}
                                                         onChange={handleChange}
-                                                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold appearance-none transition-all"
+                                                        className="w-full bg-slate-50  border border-slate-200  rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800  font-bold appearance-none transition-all"
                                                     >
                                                         {Object.values(PROJECT_STATUS).map((status) => (
-                                                            <option key={status} value={status} className="dark:bg-slate-900">{status}</option>
+                                                            <option key={status} value={status} className="">{status}</option>
                                                         ))}
                                                     </select>
                                                 </div>
@@ -214,7 +214,7 @@ export default function CreateProjectDrawer({ open, onClose, projectToEdit }) {
                                                             name="startDate"
                                                             value={formData.startDate}
                                                             onChange={handleChange}
-                                                            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold transition-all"
+                                                            className="w-full bg-slate-50  border border-slate-200  rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800  font-bold transition-all"
                                                         />
                                                     </div>
                                                     <div className="space-y-2">
@@ -226,7 +226,7 @@ export default function CreateProjectDrawer({ open, onClose, projectToEdit }) {
                                                             name="endDate"
                                                             value={formData.endDate}
                                                             onChange={handleChange}
-                                                            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold transition-all"
+                                                            className="w-full bg-slate-50  border border-slate-200  rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800  font-bold transition-all"
                                                         />
                                                     </div>
                                                 </div>
@@ -240,7 +240,7 @@ export default function CreateProjectDrawer({ open, onClose, projectToEdit }) {
                                                         value={formData.description}
                                                         onChange={handleChange}
                                                         rows={8}
-                                                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800 dark:text-slate-100 font-bold resize-none placeholder:text-slate-400 transition-all"
+                                                        className="w-full bg-slate-50  border border-slate-200  rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-800  font-bold resize-none placeholder:text-slate-400 transition-all"
                                                         placeholder="Define the scope and success criteria..."
                                                     />
                                                 </div>
@@ -249,7 +249,7 @@ export default function CreateProjectDrawer({ open, onClose, projectToEdit }) {
                                                     <button
                                                         type="button"
                                                         onClick={onClose}
-                                                        className="flex-1 px-6 py-4 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-800 transition-all font-black text-[10px] uppercase tracking-widest"
+                                                        className="flex-1 px-6 py-4 bg-slate-100  border border-slate-200  text-slate-500  rounded-2xl hover:bg-slate-200 :bg-slate-800 transition-all font-black text-[10px] uppercase tracking-widest"
                                                     >
                                                         Abort
                                                     </button>

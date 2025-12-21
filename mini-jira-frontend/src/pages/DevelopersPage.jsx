@@ -90,22 +90,22 @@ const DevelopersPage = () => {
                         <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-black text-sm shadow-md">
                             {info.getValue()?.charAt(0).toUpperCase() || '?'}
                         </div>
-                        <span className="font-bold text-slate-800 dark:text-slate-100">{info.getValue()}</span>
+                        <span className="font-bold text-slate-800 ">{info.getValue()}</span>
                     </div>
                 ),
             },
             {
                 header: 'Email',
                 accessorKey: 'email',
-                cell: (info) => <span className="text-slate-500 dark:text-slate-400 font-medium">{info.getValue()}</span>,
+                cell: (info) => <span className="text-slate-500  font-medium">{info.getValue()}</span>,
             },
             {
                 header: 'Role',
                 accessorKey: 'role',
                 cell: (info) => (
                     <span className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border ${info.getValue() === USER_ROLES.MANAGER
-                        ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-purple-100 dark:border-purple-500/20'
-                        : 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-500/20'
+                        ? 'bg-purple-50  text-purple-600  border-purple-100 '
+                        : 'bg-blue-50  text-blue-600  border-blue-100 '
                         }`}>
                         {info.getValue()}
                     </span>
@@ -120,8 +120,8 @@ const DevelopersPage = () => {
                             onClick={isManagerUser ? () => handleEditClick(info.row.original) : undefined}
                             disabled={!isManagerUser}
                             className={`p-2 rounded-xl transition-all ${isManagerUser
-                                ? 'text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer'
-                                : 'text-slate-300 dark:text-slate-700 cursor-not-allowed'
+                                ? 'text-blue-600 hover:bg-blue-50 :bg-blue-900/20 cursor-pointer'
+                                : 'text-slate-300  cursor-not-allowed'
                                 }`}
                             title={isManagerUser ? "Edit" : "Only managers can edit developers"}
                         >
@@ -161,10 +161,10 @@ const DevelopersPage = () => {
                 className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 flex-shrink-0"
             >
                 <div>
-                    <h1 className="text-4xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">
+                    <h1 className="text-4xl font-black text-slate-900  mb-2 tracking-tight">
                         Engineer Registry
                     </h1>
-                    <p className="text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px] tracking-[0.2em]">Personnel Management & Permissions</p>
+                    <p className="text-slate-500  font-bold uppercase text-[10px] tracking-[0.2em]">Personnel Management & Permissions</p>
                 </div>
                 <motion.button
                     whileHover={isManagerUser ? { scale: 1.02 } : {}}
@@ -173,7 +173,7 @@ const DevelopersPage = () => {
                     disabled={!isManagerUser}
                     className={`flex items-center gap-2 px-8 py-3.5 rounded-2xl shadow-lg transition-all font-black text-xs uppercase tracking-widest min-w-[200px] justify-center ${isManagerUser
                         ? 'bg-blue-600 hover:bg-blue-700 text-white cursor-pointer'
-                        : 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed opacity-50'
+                        : 'bg-slate-200  text-slate-400  cursor-not-allowed opacity-50'
                         }`}
                 >
                     <IoAdd size={24} />
@@ -183,25 +183,25 @@ const DevelopersPage = () => {
 
             {/* Filter Section - Fixed */}
             <div className="flex flex-col sm:flex-row gap-6 flex-shrink-0">
-                <div className="glass-card relative max-w-md flex-1 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div className="glass-card relative max-w-md flex-1 rounded-2xl bg-white  border border-slate-200  shadow-sm">
                     <IoSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input
                         value={globalFilter ?? ''}
                         onChange={(e) => setGlobalFilter(e.target.value)}
                         placeholder="Search personnel..."
-                        className="w-full bg-transparent border-none rounded-2xl pl-12 pr-4 py-4 outline-none text-slate-800 dark:text-slate-100 transition-all font-bold"
+                        className="w-full bg-transparent border-none rounded-2xl pl-12 pr-4 py-4 outline-none text-slate-800  transition-all font-bold"
                     />
                 </div>
 
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-6 flex items-center shadow-sm">
+                <div className="bg-white  border border-slate-200  rounded-2xl px-6 flex items-center shadow-sm">
                     <select
                         value={roleFilter}
                         onChange={(e) => setRoleFilter(e.target.value)}
-                        className="bg-transparent border-none text-slate-600 dark:text-slate-300 py-4 outline-none font-black text-[10px] uppercase tracking-widest cursor-pointer"
+                        className="bg-transparent border-none text-slate-600  py-4 outline-none font-black text-[10px] uppercase tracking-widest cursor-pointer"
                     >
-                        <option value="" className="dark:bg-slate-900">All Status Codes</option>
-                        <option value={USER_ROLES.DEVELOPER} className="dark:bg-slate-900">Developers</option>
-                        <option value={USER_ROLES.MANAGER} className="dark:bg-slate-900">Managers</option>
+                        <option value="" className="">All Status Codes</option>
+                        <option value={USER_ROLES.DEVELOPER} className="">Developers</option>
+                        <option value={USER_ROLES.MANAGER} className="">Managers</option>
                     </select>
                 </div>
             </div>
@@ -211,18 +211,18 @@ const DevelopersPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="glass-card rounded-[32px] overflow-hidden flex-1 min-h-0 flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm"
+                className="glass-card rounded-[32px] overflow-hidden flex-1 min-h-0 flex flex-col bg-white  border border-slate-200  shadow-sm"
             >
                 <div className="overflow-auto scrollbar-hide flex-1">
                     <table className="w-full text-left border-collapse min-w-[1000px]">
-                        <thead className="bg-slate-50 dark:bg-slate-800/50 sticky top-0 z-10 border-b border-slate-200 dark:border-slate-800">
+                        <thead className="bg-slate-50  sticky top-0 z-10 border-b border-slate-200 ">
                             {table.getHeaderGroups().map((headerGroup) => (
                                 <tr key={headerGroup.id}>
                                     {headerGroup.headers.map((header) => (
                                         <th
                                             key={header.id}
                                             onClick={header.column.getToggleSortingHandler()}
-                                            className="p-6 text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none"
+                                            className="p-6 text-[10px] font-black text-slate-500  uppercase tracking-widest cursor-pointer hover:bg-slate-100 :bg-slate-800 transition-colors select-none"
                                         >
                                             <div className="flex items-center gap-2">
                                                 {flexRender(header.column.columnDef.header, header.getContext())}
@@ -236,7 +236,7 @@ const DevelopersPage = () => {
                                 </tr>
                             ))}
                         </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                        <tbody className="divide-y divide-slate-100 ">
                             {isLoading ? (
                                 <tr>
                                     <td colSpan={columns.length} className="p-16 text-center">
@@ -252,7 +252,7 @@ const DevelopersPage = () => {
                                 </tr>
                             ) : (
                                 table.getRowModel().rows.map((row) => (
-                                    <tr key={row.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+                                    <tr key={row.id} className="hover:bg-slate-50 :bg-slate-800/50 transition-colors group">
                                         {row.getVisibleCells().map((cell) => (
                                             <td key={cell.id} className="p-6 text-sm font-medium whitespace-nowrap">
                                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -269,17 +269,17 @@ const DevelopersPage = () => {
             {/* Pagination Hub - Fixed At Bottom */}
             <div className="flex items-center justify-end gap-3 flex-shrink-0">
                 <button
-                    className="p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl disabled:opacity-20 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm"
+                    className="p-3 bg-white  border border-slate-200  rounded-2xl disabled:opacity-20 disabled:cursor-not-allowed hover:bg-slate-50 :bg-slate-800 transition-all shadow-sm"
                     onClick={() => table.previousPage()}
                     disabled={!table.getCanPreviousPage()}
                 >
                     <IoChevronDown size={20} className="rotate-90 text-slate-500" />
                 </button>
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-6 py-3 rounded-2xl text-[10px] font-black text-slate-500 tracking-widest uppercase shadow-sm">
-                    Personnel Index <span className="text-blue-600 dark:text-blue-500 mx-1">{table.getState().pagination.pageIndex + 1}</span> / {table.getPageCount() || 1}
+                <div className="bg-white  border border-slate-200  px-6 py-3 rounded-2xl text-[10px] font-black text-slate-500 tracking-widest uppercase shadow-sm">
+                    Personnel Index <span className="text-blue-600  mx-1">{table.getState().pagination.pageIndex + 1}</span> / {table.getPageCount() || 1}
                 </div>
                 <button
-                    className="p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl disabled:opacity-20 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm"
+                    className="p-3 bg-white  border border-slate-200  rounded-2xl disabled:opacity-20 disabled:cursor-not-allowed hover:bg-slate-50 :bg-slate-800 transition-all shadow-sm"
                     onClick={() => table.nextPage()}
                     disabled={!table.getCanNextPage()}
                 >

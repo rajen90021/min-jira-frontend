@@ -10,10 +10,10 @@ const icons = {
 };
 
 const bgColors = {
-    success: 'bg-white dark:bg-[#252526] border-green-500',
-    error: 'bg-white dark:bg-[#252526] border-red-500',
-    warning: 'bg-white dark:bg-[#252526] border-yellow-500',
-    info: 'bg-white dark:bg-[#252526] border-blue-500'
+    success: 'bg-white [#252526] border-green-500',
+    error: 'bg-white [#252526] border-red-500',
+    warning: 'bg-white [#252526] border-yellow-500',
+    info: 'bg-white [#252526] border-blue-500'
 };
 
 const Toast = ({ id, type = 'info', message, duration = 4000, onClose }) => {
@@ -31,15 +31,15 @@ const Toast = ({ id, type = 'info', message, duration = 4000, onClose }) => {
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-            className={`flex items-center gap-3 p-4 rounded-xl shadow-lg border-l-4 ${bgColors[type]} min-w-[320px] max-w-md pointer-events-auto backdrop-blur-sm relative overflow-hidden group`}
+            className={`flex items-center gap-3 p-4 rounded-xl shadow-lg border-l-4 ${bgColors[type]} min-w-[320px] max-w-md pointer-events-auto  relative overflow-hidden group`}
         >
             <div className="shrink-0">{icons[type]}</div>
-            <div className="flex-1 text-sm font-medium text-gray-800 dark:text-gray-200">
+            <div className="flex-1 text-sm font-medium text-gray-800 ">
                 {message}
             </div>
             <button
                 onClick={() => onClose(id)}
-                className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                className="p-1 rounded-full hover:bg-gray-100 :bg-gray-700 text-gray-400 hover:text-gray-600 :text-gray-200 transition-colors"
             >
                 <IoClose size={18} />
             </button>

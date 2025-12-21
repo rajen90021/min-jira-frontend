@@ -58,7 +58,7 @@ export default function TimeTrackingModal({ open, onClose, ticket }) {
     return (
         <Transition.Root show={open} as={Fragment}>
             <Dialog as="div" className="relative z-50" onClose={onClose}>
-                <div className="fixed inset-0 bg-black/30 backdrop-blur-sm transition-opacity" />
+                <div className="fixed inset-0 bg-black/30  transition-opacity" />
 
                 <div className="fixed inset-0 z-10 overflow-y-auto">
                     <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
@@ -71,9 +71,9 @@ export default function TimeTrackingModal({ open, onClose, ticket }) {
                             leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                         >
-                            <Dialog.Panel className="relative transform overflow-hidden rounded-2xl bg-white dark:bg-[#1e1e1e] text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-gray-200 dark:border-gray-700">
-                                <div className="px-6 py-6 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between bg-gray-50 dark:bg-[#252526]">
-                                    <Dialog.Title className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                            <Dialog.Panel className="relative transform overflow-hidden rounded-2xl bg-white [#1e1e1e] text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-gray-200 ">
+                                <div className="px-6 py-6 border-b border-gray-200  flex items-center justify-between bg-gray-50 [#252526]">
+                                    <Dialog.Title className="text-lg font-semibold text-gray-900  flex items-center gap-2">
                                         <IoTime className="text-blue-500" />
                                         Log Time: {ticket?.title}
                                     </Dialog.Title>
@@ -89,7 +89,7 @@ export default function TimeTrackingModal({ open, onClose, ticket }) {
                                     <form onSubmit={handleSubmit} className="space-y-4">
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                                <label className="block text-sm font-medium text-gray-700  mb-1">
                                                     Duration (minutes)
                                                 </label>
                                                 <input
@@ -98,12 +98,12 @@ export default function TimeTrackingModal({ open, onClose, ticket }) {
                                                     min="1"
                                                     value={duration}
                                                     onChange={(e) => setDuration(e.target.value)}
-                                                    className="w-full bg-gray-50 dark:bg-[#252526] border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white"
+                                                    className="w-full bg-gray-50 [#252526] border border-gray-200  rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500/50 text-gray-900 "
                                                     placeholder="e.g. 60"
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                                <label className="block text-sm font-medium text-gray-700  mb-1">
                                                     Date
                                                 </label>
                                                 <input
@@ -111,20 +111,20 @@ export default function TimeTrackingModal({ open, onClose, ticket }) {
                                                     required
                                                     value={date}
                                                     onChange={(e) => setDate(e.target.value)}
-                                                    className="w-full bg-gray-50 dark:bg-[#252526] border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white"
+                                                    className="w-full bg-gray-50 [#252526] border border-gray-200  rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500/50 text-gray-900 "
                                                 />
                                             </div>
                                         </div>
 
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                            <label className="block text-sm font-medium text-gray-700  mb-1">
                                                 Description (Optional)
                                             </label>
                                             <textarea
                                                 rows="2"
                                                 value={description}
                                                 onChange={(e) => setDescription(e.target.value)}
-                                                className="w-full bg-gray-50 dark:bg-[#252526] border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white resize-none"
+                                                className="w-full bg-gray-50 [#252526] border border-gray-200  rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500/50 text-gray-900  resize-none"
                                                 placeholder="What did you work on?"
                                             />
                                         </div>
@@ -140,33 +140,33 @@ export default function TimeTrackingModal({ open, onClose, ticket }) {
                                     </form>
 
                                     <div className="mt-8">
-                                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 border-b border-gray-200 dark:border-gray-800 pb-2">
+                                        <h4 className="text-sm font-semibold text-gray-900  mb-4 border-b border-gray-200  pb-2">
                                             Recent Logs
                                         </h4>
                                         <div className="space-y-3 max-h-48 overflow-y-auto pr-1">
                                             {loadingLogs ? (
                                                 <div className="text-center text-gray-500 text-sm py-4">Loading history...</div>
                                             ) : logs.length === 0 ? (
-                                                <div className="text-center text-gray-500 dark:text-gray-400 text-sm py-4 italic">
+                                                <div className="text-center text-gray-500  text-sm py-4 italic">
                                                     No time logged yet.
                                                 </div>
                                             ) : (
                                                 logs.map((log) => (
-                                                    <div key={log._id} className="flex justify-between items-start text-sm p-3 bg-gray-50 dark:bg-[#252526] rounded-lg">
+                                                    <div key={log._id} className="flex justify-between items-start text-sm p-3 bg-gray-50 [#252526] rounded-lg">
                                                         <div>
-                                                            <div className="font-medium text-gray-900 dark:text-white">
+                                                            <div className="font-medium text-gray-900 ">
                                                                 {log.userId?.name}
                                                             </div>
-                                                            <div className="text-gray-500 dark:text-gray-400 text-xs">
+                                                            <div className="text-gray-500  text-xs">
                                                                 {format(new Date(log.startTime), 'MMM d, yyyy')}
                                                             </div>
                                                             {log.description && (
-                                                                <div className="text-gray-600 dark:text-gray-300 mt-1">
+                                                                <div className="text-gray-600  mt-1">
                                                                     {log.description}
                                                                 </div>
                                                             )}
                                                         </div>
-                                                        <div className="font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded">
+                                                        <div className="font-bold text-blue-600  bg-blue-50  px-2 py-1 rounded">
                                                             {log.duration}m
                                                         </div>
                                                     </div>
